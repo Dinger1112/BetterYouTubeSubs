@@ -1,0 +1,20 @@
+{
+
+  "manifest_version": 2,
+  "name": "Better YouTube Subs",
+  "version": "1.0",
+
+  "description": "Adds new functionality to YouTube's subscription page.",
+
+  "icons": {
+    "48": "icons/border-48.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["byts.js"]
+    }
+  ]
+
+}
