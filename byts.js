@@ -8,6 +8,7 @@ var styles = `
         cursor: pointer;
         font-weight: 500;
         letter-spacing: 0.5px;
+        user-select: none;
     }
 
     .dropdown_content {
@@ -83,19 +84,36 @@ type_dropdown.classList.add('hidden')
 let type_all = document.createElement('div')
 type_all.innerText = 'All'
 type_all.onclick = function(){
-    type_all.style.color = 'green'
+    let videos = document.getElementsByTagName('ytd-grid-video-renderer')
+    for (let i = 0; i < videos.length; i++) {
+        videos[i].style.display = 'inline-block'
+    }
 }
 
 let type_videos = document.createElement('div')
 type_videos.innerText = 'Videos'
 type_videos.onclick = function(){
-    type_videos.style.color = 'green'
+    let videos = document.getElementsByTagName('ytd-grid-video-renderer')
+    for (let i = 0; i < videos.length; i++) {
+        if(isLive(videos[i])) {
+            videos[i].style.display = 'none'
+        } else {
+            videos[i].style.display = 'inline-block'
+        }
+    }
 }
 
 let type_live = document.createElement('div')
 type_live.innerText = 'Live Streams'
 type_live.onclick = function(){
-    type_live.style.color = 'green'
+    let videos = document.getElementsByTagName('ytd-grid-video-renderer')
+    for (let i = 0; i < videos.length; i++) {
+        if(isLive(videos[i])) {
+            videos[i].style.display = 'inline-block'
+        } else {
+            videos[i].style.display = 'none'
+        }
+    }
 }
 
 type_dropdown.appendChild(type_all)
@@ -116,3 +134,15 @@ window.onclick = function(event) {
         type_dropdown.classList.add('hidden')
     }
 }
+
+function isLive(v) {
+    let video = new DOMParser().parseFromString(v.innerHTML, 'text/html')
+    if (video.getElementById('video-badges').textContent.search('LIVE NOW') != -1 ||
+        video.getElementById('buttons').textContent == 'Set reminder' ||
+        video.getElementById('meta').textContent.search('Streamed') != -1) {
+            return true
+    } else {
+        return false
+    }
+}
+
