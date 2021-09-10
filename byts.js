@@ -137,12 +137,8 @@ window.onclick = function(event) {
 
 function isLive(v) {
     let video = new DOMParser().parseFromString(v.innerHTML, 'text/html')
-    if (video.getElementById('meta').textContent.search('Streamed') != -1 ||
-        video.getElementById('overlays').textContent.search('LIVE') != -1 ||
-        video.getElementById('video-badges').textContent.search('LIVE NOW') != -1) {
-            return true
-    } else {
-        return false
-    }
+    return (video.getElementById('meta').textContent.search('Streamed') != -1 || 
+            video.getElementById('overlays').textContent.search('LIVE') != -1 || 
+            video.getElementById('video-badges').textContent.search('LIVE NOW') != -1)
 }
 
