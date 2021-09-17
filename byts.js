@@ -8,7 +8,6 @@ let finished = true
 
 if (!is_setup) {
     setup()
-    is_setup = true
 }
 
 function setup() {
@@ -152,7 +151,7 @@ function setup() {
         }
     }
 
-    //add an onclick of the subs button here
+    is_setup = true
 }
 
 function isLive(vid) {
