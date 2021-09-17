@@ -159,7 +159,7 @@ function applyFilters() {
     let vids = document.getElementsByTagName('ytd-grid-video-renderer')
     for (let i = 0; i < vids.length; i++) {
         let vid = new DOMParser().parseFromString(vids[i].innerHTML, 'text/html')
-        let progress_el = vid.getElementById('progress')
+        let progress = vid.getElementById('progress')
         let is_live = (vid.getElementById('meta').textContent.search('Streamed') != -1 || 
                         vid.getElementById('overlays').textContent.search('LIVE') != -1 || 
                         vid.getElementById('video-badges').textContent.search('LIVE NOW') != -1)
@@ -167,9 +167,9 @@ function applyFilters() {
                 (videos && !is_live) ||
                 (live_streams && is_live)
             ) && (
-                (unwatched && (progress_el == null || progress_el.style.width.slice(0, -1) < 15)) ||
-                (continue_watching && (progress_el != null && progress_el.style.width.slice(0, -1) >= 15 && progress_el.style.width.slice(0, -1) < 95)) ||
-                (finished && (progress_el != null && progress_el.style.width.slice(0, -1) >= 95))
+                (unwatched && (progress == null || progress.style.width.slice(0, -1) < 15)) ||
+                (continue_watching && (progress != null && progress.style.width.slice(0, -1) >= 15 && progress.style.width.slice(0, -1) < 95)) ||
+                (finished && (progress != null && progress.style.width.slice(0, -1) >= 95))
             )
         ) {
             vids[i].style.display = 'inline-block'
@@ -178,3 +178,6 @@ function applyFilters() {
         }
     }
 }
+let vids = document.getElementsByTagName('ytd-grid-video-renderer')
+let vid = new DOMParser().parseFromString(vids[0].innerHTML, 'text/html')
+console.log(vid)
