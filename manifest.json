@@ -6,10 +6,6 @@
 
   "description": "Adds new functionality to YouTube's subscription page.",
 
-  "icons": {
-    "48": "icons/border-48.png"
-  },
-
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/feed/subscriptions"],
