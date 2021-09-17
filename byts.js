@@ -163,14 +163,13 @@ function applyFilters() {
         let is_live = (vid.getElementById('meta').textContent.search('Streamed') != -1 || 
                         vid.getElementById('overlays').textContent.search('LIVE') != -1 || 
                         vid.getElementById('video-badges').textContent.search('LIVE NOW') != -1)
-        if (
-            (
+        if ((
                 (videos && !is_live) ||
                 (live_streams && is_live)
             ) && (
                 (unwatched && (progress_el == null || progress_el.style.width.slice(0, -1) < 15)) ||
-                (continue_watching && (progress_el != null && progress_el.style.width.slice(0, -1) >= 15 && progress_el.style.width.slice(0, -1) < 98)) ||
-                (finished && (progress_el != null && progress_el.style.width.slice(0, -1) >= 98))
+                (continue_watching && (progress_el != null && progress_el.style.width.slice(0, -1) >= 15 && progress_el.style.width.slice(0, -1) < 95)) ||
+                (finished && (progress_el != null && progress_el.style.width.slice(0, -1) >= 95))
             )
         ) {
             vids[i].style.display = 'inline-block'
