@@ -25,13 +25,14 @@ function setup() {
 
         .dropdown_content {
             position: absolute;
-            background-color: #f1f1f1;
+            background-color: #202020;
             z-index: 2;
             cursor: pointer;
+            user-select: none;
         }
 
         .dropdown_content div {
-            color: black;
+            color: #fff;
             padding: 12px 16px;
         }
     `
@@ -154,18 +155,14 @@ function setup() {
     is_setup = true
 }
 
-function isLive(vid) {
-    return (vid.getElementById('meta').textContent.search('Streamed') != -1 || 
-            vid.getElementById('overlays').textContent.search('LIVE') != -1 || 
-            vid.getElementById('video-badges').textContent.search('LIVE NOW') != -1)
-}
-
 function applyFilters() {
     let vids = document.getElementsByTagName('ytd-grid-video-renderer')
     for (let i = 0; i < vids.length; i++) {
         let vid = new DOMParser().parseFromString(vids[i].innerHTML, 'text/html')
         let progress_el = vid.getElementById('progress')
-        let is_live = isLive(vid)
+        let is_live = (vid.getElementById('meta').textContent.search('Streamed') != -1 || 
+                        vid.getElementById('overlays').textContent.search('LIVE') != -1 || 
+                        vid.getElementById('video-badges').textContent.search('LIVE NOW') != -1)
         if (
             (
                 (videos && !is_live) ||
