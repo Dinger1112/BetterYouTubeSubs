@@ -6,9 +6,6 @@ let unwatched = true
 let continue_watching = true
 let finished = true
 
-let white_list = []
-let black_list = []
-
 if (!is_setup) {
     setup()
 }
