@@ -6,6 +6,9 @@ let unwatched = true
 let continue_watching = true
 let finished = true
 
+let white_list = []
+let black_list = []
+
 if (!is_setup) {
     setup()
 }
@@ -178,6 +181,3 @@ function applyFilters() {
         }
     }
 }
-let vids = document.getElementsByTagName('ytd-grid-video-renderer')
-let vid = new DOMParser().parseFromString(vids[0].innerHTML, 'text/html')
-console.log(vid)
