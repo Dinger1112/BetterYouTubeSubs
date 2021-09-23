@@ -35,6 +35,21 @@ function setup() {
             color: #fff;
             padding: 12px 16px;
         }
+
+        .status div {
+            float: left;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .show_status {
+            padding: 18px 3px 16px 16px;
+        }
+
+        .type_status {
+            padding: 18px 16px 16px 3px;
+        }
     `
     var styleSheet = document.createElement('style')
     styleSheet.innerText = styles
@@ -60,6 +75,7 @@ function setup() {
         unwatched = true
         continue_watching = true
         finished = true
+        show_status.innerText = ''
         applyFilters()
     }
 
@@ -69,6 +85,7 @@ function setup() {
         unwatched = true
         continue_watching = false
         finished = false
+        show_status.innerText = 'UNWATCHED'
         applyFilters()
     }
 
@@ -78,6 +95,7 @@ function setup() {
         unwatched = false
         continue_watching = true
         finished = false
+        show_status.innerText = 'CONTINUE WATCHING'
         applyFilters()
     }
 
@@ -87,6 +105,7 @@ function setup() {
         unwatched = false
         continue_watching = false
         finished = true
+        show_status.innerText = 'FINISHED'
         applyFilters()
     }
 
@@ -116,6 +135,7 @@ function setup() {
     type_all.onclick = function(){
         videos = true
         live_streams = true
+        type_status.innerText = ''
         applyFilters()
     }
 
@@ -124,6 +144,7 @@ function setup() {
     type_videos.onclick = function(){
         videos = true
         live_streams = false
+        type_status.innerText = 'VIDEOS'
         applyFilters()
     }
 
@@ -132,6 +153,7 @@ function setup() {
     type_live.onclick = function(){
         videos = false
         live_streams = true
+        type_status.innerText = 'LIVE STREAMS'
         applyFilters()
     }
 
@@ -141,9 +163,22 @@ function setup() {
     type.appendChild(type_btn)
     type.appendChild(type_dropdown)
 
+    let status = document.createElement('div')
+    status.classList.add('status')
+
+    let show_status = document.createElement('div')
+    show_status.classList.add('show_status')
+
+    let type_status = document.createElement('div')
+    type_status.classList.add('type_status')
+    
+    status.appendChild(show_status)
+    status.appendChild(type_status)
+
     let title_container = document.getElementById('title-container')
     title_container.insertBefore(show, title_container.childNodes[5])
     title_container.insertBefore(type, title_container.childNodes[5])
+    title_container.insertBefore(status, title_container.childNodes[5])
 
     window.onclick = function(event) {
         if (!event.target.matches('.btn')) {
