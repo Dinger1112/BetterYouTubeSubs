@@ -25,7 +25,7 @@ function setup() {
 
         .dropdown_content {
             position: absolute;
-            background-color: #202020;
+            background-color: #252525;
             z-index: 2;
             cursor: pointer;
             user-select: none;
@@ -157,17 +157,17 @@ function setup() {
 
 function applyFilters() {
     let vids = document.getElementsByTagName('ytd-grid-video-renderer')
-    for (let i = 0; i < vids.length; i++) {
-        let vid = new DOMParser().parseFromString(vids[i].innerHTML, 'text/html')
-        let progress = vid.getElementById('progress')
-        try{
+    for (let vid of vids) {
+        let vid_dom = new DOMParser().parseFromString(vid.innerHTML, 'text/html')
+        let progress = vid_dom.getElementById('progress')
+        try {
             progress = progress.style.width.slice(0, -1)
         } catch(err) {
             progress = 0
         }
-        let is_live = (vid.getElementById('meta').textContent.search('Streamed') != -1 || 
-                        vid.getElementById('overlays').textContent.search('LIVE') != -1 || 
-                        vid.getElementById('video-badges').textContent.search('LIVE NOW') != -1)
+        let is_live = (vid_dom.getElementById('meta').textContent.search('Streamed') != -1 || 
+                        vid_dom.getElementById('overlays').textContent.search('LIVE') != -1 || 
+                        vid_dom.getElementById('video-badges').textContent.search('LIVE NOW') != -1)
         if ((
                 (videos && !is_live) ||
                 (live_streams && is_live)
@@ -177,9 +177,9 @@ function applyFilters() {
                 (finished && progress >= 95)
             )
         ) {
-            vids[i].style.display = 'inline-block'
+            vid.style.display = 'inline-block'
         } else {
-            vids[i].style.display = 'none'
+            vid.style.display = 'none'
         }
     }
 }
