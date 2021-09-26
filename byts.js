@@ -6,6 +6,14 @@ let unwatched = true
 let continue_watching = true
 let finished = true
 
+let white_list
+let black_list
+browser.storage.sync.get().then(function(value) {
+    white_list = value.white_list
+    black_list = value.black_list
+    applyFilters()
+})
+
 if (!is_setup) {
     setup()
 }
@@ -195,6 +203,8 @@ function applyFilters() {
     for (let vid of vids) {
         let vid_dom = new DOMParser().parseFromString(vid.innerHTML, 'text/html')
         let progress = vid_dom.getElementById('progress')
+        let channel = vid_dom.getElementById('channel-name').getElementsByTagName('a')[0].textContent
+        let title = vid_dom.getElementById('video-title').textContent
         try {
             progress = progress.style.width.slice(0, -1)
         } catch(err) {
@@ -208,13 +218,35 @@ function applyFilters() {
                 (live_streams && is_live)
             ) && (
                 (unwatched && progress < 15) ||
-                (continue_watching && progress >= 15 && progress < 95) ||
-                (finished && progress >= 95)
-            )
+                (continue_watching && progress >= 15 && progress <= 85) ||
+                (finished && progress > 85)
+            ) && whiteListChecker(channel, title) && blackListChecker(channel, title)
         ) {
             vid.style.display = 'inline-block'
         } else {
             vid.style.display = 'none'
         }
     }
+}
+
+function whiteListChecker(channel, title) {
+    let isChannelInWhiteList = false
+    for (obj of white_list) {
+        if (channel == obj.channel) {
+            isChannelInWhiteList = true
+            if (title.search(obj.title) != -1) {
+                return true
+            }
+        }
+    }
+    return !isChannelInWhiteList
+}
+
+function blackListChecker(channel, title) {
+    for (obj of black_list) {
+        if (channel == obj.channel && title.search(obj.title) != -1) {
+            return false
+        }
+    }
+    return true
 }

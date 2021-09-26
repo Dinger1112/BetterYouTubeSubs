@@ -1,0 +1,11 @@
+.list_container {
+    padding: 20px;
+}
+
+button {
+    visibility: hidden;
+}
+
+li:hover > button {
+    visibility: visible;
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="options.css">
+  </head>
+
+  <body>
+    <div class="list_container">
+      <h3>White List</h3>
+
+      <label for="white_channel_input">Channel</label>
+      <input type="text" id="white_channel_input">
+
+      <label for="white_title_input">Title</label>
+      <input type="text" id="white_title_input">
+
+      <input type="button" value="Add" id="white_btn">
+      <ul id="white_list"></ul>
+    </div>
+
+    <div class="list_container">
+      <h3>Black List</h3>
+
+      <label for="black_channel_input">Channel</label>
+      <input type="text" id="black_channel_input">
+
+      <label for="black_title_input">Title</label>
+      <input type="text" id="black_title_input">
+
+      <input type="button" value="Add" id="black_btn">
+      <ul id="black_list"></ul>
+    </div>
+  </body>
+  
+  <script src="options.js"></script>
+</html>
