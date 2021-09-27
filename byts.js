@@ -34,7 +34,7 @@ function setup() {
             white_list = value.white_list
             black_list = value.black_list
         }
-        applyCustomFilters()
+        applyChannelFilters()
     })
     
     var styles = `
@@ -255,9 +255,9 @@ function applyFilters() {
 function passesWhiteList(channel, title) {
     let isChannelInWhiteList = false
     for (obj of white_list) {
-        if (channel == obj.channel) {
+        if (channel == obj.channel.toLowerCase()) {
             isChannelInWhiteList = true
-            if (title.search(obj.title) != -1) {
+            if (title.search(obj.title.toLowerCase()) != -1) {
                 return true
             }
         }
@@ -267,19 +267,19 @@ function passesWhiteList(channel, title) {
 
 function passesBlackList(channel, title) {
     for (obj of black_list) {
-        if (channel == obj.channel && title.search(obj.title) != -1) {
+        if (channel == obj.channel.toLowerCase() && title.search(obj.title.toLowerCase()) != -1) {
             return false
         }
     }
     return true
 }
 
-function applyCustomFilters() {
+function applyChannelFilters() {
     let vids = subs_dom.getElementsByTagName('ytd-grid-video-renderer')
     for (let vid of vids) {
         let vid_dom = new DOMParser().parseFromString(vid.innerHTML, 'text/html')
-        let channel = vid_dom.getElementById('channel-name').getElementsByTagName('a')[0].textContent
-        let title = vid_dom.getElementById('video-title').textContent
+        let channel = vid_dom.getElementById('channel-name').getElementsByTagName('a')[0].textContent.toLowerCase()
+        let title = vid_dom.getElementById('video-title').textContent.toLowerCase()
         if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
             vid.remove()
         }
