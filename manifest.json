@@ -16,7 +16,7 @@
 
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/feed/subscriptions"],
+      "matches": ["*://*.youtube.com/*"],
       "js": ["byts.js"]
     }
   ],

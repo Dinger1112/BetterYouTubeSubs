@@ -1,3 +1,4 @@
+let subs_dom
 let is_setup = false
 
 let videos = true
@@ -6,19 +7,36 @@ let unwatched = true
 let continue_watching = true
 let finished = true
 
-let white_list
-let black_list
-browser.storage.sync.get().then(function(value) {
-    white_list = value.white_list
-    black_list = value.black_list
-    applyFilters()
-})
+let white_list = []
+let black_list = []
 
-if (!is_setup) {
+if (window.location.pathname == '/feed/subscriptions') {
     setup()
+} else {
+    window.addEventListener('yt-navigate-finish', function() {
+        if (!is_setup && window.location.pathname == '/feed/subscriptions') {
+            setup()
+        }
+    })
 }
 
 function setup() {
+    let ytd_browse_list = document.getElementById('page-manager').getElementsByTagName('ytd-browse')
+    for (ytd_browse of ytd_browse_list) {
+        if (ytd_browse.getAttribute('page-subtype') == 'subscriptions') {
+            subs_dom = ytd_browse
+            break
+        }
+    }
+    
+    browser.storage.sync.get().then(function(value) {
+        if (value.white_list != undefined){
+            white_list = value.white_list
+            black_list = value.black_list
+        }
+        applyCustomFilters()
+    })
+    
     var styles = `
         .btn {
             color: rgb(62, 166, 255);
@@ -183,7 +201,14 @@ function setup() {
     status.appendChild(show_status)
     status.appendChild(type_status)
 
-    let title_container = document.getElementById('title-container')
+    let title_container 
+    let divs = subs_dom.getElementsByTagName('div')
+    for (let div of divs) {
+        if(div.id == 'title-container') {
+            title_container = div
+            break
+        }
+    }
     title_container.insertBefore(show, title_container.childNodes[5])
     title_container.insertBefore(type, title_container.childNodes[5])
     title_container.insertBefore(status, title_container.childNodes[5])
@@ -199,12 +224,10 @@ function setup() {
 }
 
 function applyFilters() {
-    let vids = document.getElementsByTagName('ytd-grid-video-renderer')
+    let vids = subs_dom.getElementsByTagName('ytd-grid-video-renderer')
     for (let vid of vids) {
         let vid_dom = new DOMParser().parseFromString(vid.innerHTML, 'text/html')
         let progress = vid_dom.getElementById('progress')
-        let channel = vid_dom.getElementById('channel-name').getElementsByTagName('a')[0].textContent
-        let title = vid_dom.getElementById('video-title').textContent
         try {
             progress = progress.style.width.slice(0, -1)
         } catch(err) {
@@ -220,7 +243,7 @@ function applyFilters() {
                 (unwatched && progress < 15) ||
                 (continue_watching && progress >= 15 && progress <= 85) ||
                 (finished && progress > 85)
-            ) && whiteListChecker(channel, title) && blackListChecker(channel, title)
+            )
         ) {
             vid.style.display = 'inline-block'
         } else {
@@ -229,7 +252,7 @@ function applyFilters() {
     }
 }
 
-function whiteListChecker(channel, title) {
+function passesWhiteList(channel, title) {
     let isChannelInWhiteList = false
     for (obj of white_list) {
         if (channel == obj.channel) {
@@ -242,11 +265,23 @@ function whiteListChecker(channel, title) {
     return !isChannelInWhiteList
 }
 
-function blackListChecker(channel, title) {
+function passesBlackList(channel, title) {
     for (obj of black_list) {
         if (channel == obj.channel && title.search(obj.title) != -1) {
             return false
         }
     }
     return true
+}
+
+function applyCustomFilters() {
+    let vids = subs_dom.getElementsByTagName('ytd-grid-video-renderer')
+    for (let vid of vids) {
+        let vid_dom = new DOMParser().parseFromString(vid.innerHTML, 'text/html')
+        let channel = vid_dom.getElementById('channel-name').getElementsByTagName('a')[0].textContent
+        let title = vid_dom.getElementById('video-title').textContent
+        if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
+            vid.remove()
+        }
+    }
 }
