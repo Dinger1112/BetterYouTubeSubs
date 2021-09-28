@@ -1,5 +1,6 @@
 # BetterYoutubeSubs
-Filter the videos that show up in your YouTube subscription feed to better manage the content you want to watch. 
+Filter the videos that show up in your YouTube subscription feed to better manage the content you want to watch. <br>
+Supported browsers: Firefox
 
 ## Features
 ### Filter by
