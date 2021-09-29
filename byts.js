@@ -33,53 +33,9 @@ function setup() {
         if (value.white_list != undefined){
             white_list = value.white_list
             black_list = value.black_list
+            applyChannelFilters()
         }
-        applyChannelFilters()
     })
-    
-    var styles = `
-        .btn {
-            color: rgb(62, 166, 255);
-            padding: 16px;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            user-select: none;
-        }
-
-        .dropdown_content {
-            position: absolute;
-            background-color: #252525;
-            z-index: 2;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .dropdown_content div {
-            color: #fff;
-            padding: 12px 16px;
-        }
-
-        .status div {
-            float: left;
-            font-size: 12px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-        }
-
-        .show_status {
-            padding: 18px 3px 16px 16px;
-        }
-
-        .type_status {
-            padding: 18px 16px 16px 3px;
-        }
-    `
-    var styleSheet = document.createElement('style')
-    styleSheet.innerText = styles
-    document.head.appendChild(styleSheet)
 
     let show = document.createElement('div')
 

@@ -9,15 +9,15 @@
 
   "browser_specific_settings": {
     "gecko": {
-        "id": "Better-YouTube-Subs@Dinger1112",
-        "strict_min_version": "42a1"
+        "id": "Better-YouTube-Subs@Dinger1112"
     }
   },
 
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "js": ["byts.js"]
+      "js": ["byts.js"],
+      "css": ["byts.css"]
     }
   ],
 
