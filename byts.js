@@ -10,14 +10,21 @@ let finished = true
 let white_list = []
 let black_list = []
 
-if (window.location.pathname == '/feed/subscriptions') {
-    setup()
-} else {
-    window.addEventListener('yt-navigate-finish', function() {
-        if (!is_setup && window.location.pathname == '/feed/subscriptions') {
+window.addEventListener('yt-navigate-finish', function() {
+    if (window.location.pathname == '/feed/subscriptions') {
+        if(!is_setup) {
             setup()
+        } else {
+            setTimeout(() => {
+                applyFilters()
+                applyChannelFilters()
+            }, 1000);
         }
-    })
+    }
+})
+
+if (!is_setup && window.location.pathname == '/feed/subscriptions') {
+    setup()
 }
 
 function setup() {
@@ -173,6 +180,18 @@ function setup() {
         if (!event.target.matches('.btn')) {
             show_dropdown.classList.add('hidden')
             type_dropdown.classList.add('hidden')
+        }
+    }
+
+    for (let div of divs) {
+        if(div.id == 'contents') {
+            new MutationObserver(function () {
+                setTimeout(() => {
+                    applyFilters()
+                    applyChannelFilters()
+                }, 1500);
+            }).observe(div, {childList: true})
+            break
         }
     }
 
