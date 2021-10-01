@@ -176,12 +176,12 @@ function setup() {
     title_container.insertBefore(type, title_container.childNodes[5])
     title_container.insertBefore(status, title_container.childNodes[5])
 
-    window.onclick = function(event) {
+    window.addEventListener('click', function(event) {
         if (!event.target.matches('.btn')) {
             show_dropdown.classList.add('hidden')
             type_dropdown.classList.add('hidden')
         }
-    }
+    })
 
     for (let div of divs) {
         if(div.id == 'contents') {
