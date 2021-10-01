@@ -185,11 +185,13 @@ function setup() {
 
     for (let div of divs) {
         if(div.id == 'contents') {
-            new MutationObserver(function () {
-                setTimeout(() => {
-                    applyFilters()
-                    applyChannelFilters()
-                }, 1500);
+            new MutationObserver(function (mutations) {
+                if (mutations[0].addedNodes.length > 1) {
+                    setTimeout(() => {
+                        applyFilters()
+                        applyChannelFilters()
+                    }, 1000);
+                }
             }).observe(div, {childList: true})
             break
         }
