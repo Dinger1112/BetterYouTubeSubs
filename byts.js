@@ -218,8 +218,8 @@ function applyFilters() {
                 (live_streams && is_live)
             ) && (
                 (unwatched && progress < 15) ||
-                (continue_watching && progress >= 15 && progress <= 85) ||
-                (finished && progress > 85)
+                (continue_watching && progress >= 15 && progress <= 80) ||
+                (finished && progress > 80)
             )
         ) {
             vid.style.display = 'inline-block'
