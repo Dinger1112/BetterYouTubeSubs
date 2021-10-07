@@ -1,5 +1,5 @@
 .btn {
-    color: rgb(62, 166, 255);
+    color: var(--yt-spec-call-to-action);
     padding: 16px;
     font-size: 14px;
     border: none;
@@ -11,14 +11,14 @@
 
 .dropdown_content {
     position: absolute;
-    background-color: #252525;
+    background-color: var(--yt-spec-brand-background-primary);
     z-index: 2;
     cursor: pointer;
     user-select: none;
 }
 
 .dropdown_content div {
-    color: #fff;
+    color: var(--yt-spec-text-primary);
     padding: 12px 16px;
 }
 
