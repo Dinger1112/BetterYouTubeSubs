@@ -10,11 +10,11 @@ let finished = true
 let white_list = []
 let black_list = []
 
-window.addEventListener('yt-navigate-finish', function() {
+window.addEventListener('yt-navigate-finish', () => {
     if (window.location.pathname == '/feed/subscriptions') {
-        if(!is_setup) {
+        if(!is_setup) 
             setup()
-        } else {
+        else {
             setTimeout(() => {
                 applyFilters()
                 applyChannelFilters()
@@ -23,9 +23,8 @@ window.addEventListener('yt-navigate-finish', function() {
     }
 })
 
-if (!is_setup && window.location.pathname == '/feed/subscriptions') {
+if (!is_setup && window.location.pathname == '/feed/subscriptions') 
     setup()
-}
 
 function setup() {
     let ytd_browse_list = document.getElementById('page-manager').getElementsByTagName('ytd-browse')
@@ -36,8 +35,8 @@ function setup() {
         }
     }
     
-    browser.storage.sync.get().then(function(value) {
-        if (value.white_list != undefined){
+    browser.storage.sync.get().then((value) => {
+        if (value.white_list != undefined) {
             white_list = value.white_list
             black_list = value.black_list
             applyChannelFilters()
@@ -49,7 +48,7 @@ function setup() {
     let show_btn = document.createElement('div')
     show_btn.innerText = 'SHOW'
     show_btn.classList.add('btn')
-    show_btn.onclick = function(){
+    show_btn.onclick = () => {
         show_dropdown.classList.toggle('hidden')
         type_dropdown.classList.add('hidden')
     }
@@ -60,7 +59,7 @@ function setup() {
 
     let show_all = document.createElement('div')
     show_all.innerText = 'All'
-    show_all.onclick = function(){
+    show_all.onclick = () => {
         unwatched = true
         continue_watching = true
         finished = true
@@ -70,7 +69,7 @@ function setup() {
 
     let show_unwatched = document.createElement('div')
     show_unwatched.innerText = 'Unwatched'
-    show_unwatched.onclick = function(){
+    show_unwatched.onclick = () => {
         unwatched = true
         continue_watching = false
         finished = false
@@ -80,7 +79,7 @@ function setup() {
 
     let show_continue_watching = document.createElement('div')
     show_continue_watching.innerText = 'Continue Watching'
-    show_continue_watching.onclick = function(){
+    show_continue_watching.onclick = () => {
         unwatched = false
         continue_watching = true
         finished = false
@@ -90,7 +89,7 @@ function setup() {
 
     let show_finished = document.createElement('div')
     show_finished.innerText = 'Finished'
-    show_finished.onclick = function(){
+    show_finished.onclick = () => {
         unwatched = false
         continue_watching = false
         finished = true
@@ -110,7 +109,7 @@ function setup() {
     let type_btn = document.createElement('div')
     type_btn.innerText = 'TYPE'
     type_btn.classList.add('btn')
-    type_btn.onclick = function(){
+    type_btn.onclick = () => {
         type_dropdown.classList.toggle('hidden')
         show_dropdown.classList.add('hidden')
     }
@@ -121,7 +120,7 @@ function setup() {
 
     let type_all = document.createElement('div')
     type_all.innerText = 'All'
-    type_all.onclick = function(){
+    type_all.onclick = () => {
         videos = true
         live_streams = true
         type_status.innerText = ''
@@ -130,7 +129,7 @@ function setup() {
 
     let type_videos = document.createElement('div')
     type_videos.innerText = 'Videos'
-    type_videos.onclick = function(){
+    type_videos.onclick = () => {
         videos = true
         live_streams = false
         type_status.innerText = 'VIDEOS'
@@ -139,7 +138,7 @@ function setup() {
 
     let type_live = document.createElement('div')
     type_live.innerText = 'Live Streams'
-    type_live.onclick = function(){
+    type_live.onclick = () => {
         videos = false
         live_streams = true
         type_status.innerText = 'LIVE STREAMS'
@@ -176,7 +175,7 @@ function setup() {
     title_container.insertBefore(type, title_container.childNodes[5])
     title_container.insertBefore(status, title_container.childNodes[5])
 
-    window.addEventListener('click', function(event) {
+    window.addEventListener('click', (event) => {
         if (!event.target.matches('.btn')) {
             show_dropdown.classList.add('hidden')
             type_dropdown.classList.add('hidden')
@@ -185,7 +184,7 @@ function setup() {
 
     for (let div of divs) {
         if(div.id == 'contents') {
-            new MutationObserver(function (mutations) {
+            new MutationObserver((mutations) => {
                 if (mutations[0].addedNodes.length > 1) {
                     setTimeout(() => {
                         applyFilters()
@@ -205,11 +204,8 @@ function applyFilters() {
     for (let vid of vids) {
         let vid_dom = new DOMParser().parseFromString(vid.innerHTML, 'text/html')
         let progress = vid_dom.getElementById('progress')
-        try {
-            progress = progress.style.width.slice(0, -1)
-        } catch(err) {
-            progress = 0
-        }
+        try {progress = progress.style.width.slice(0, -1)}
+        catch(err) {progress = 0}
         let is_live = (vid_dom.getElementById('meta').textContent.search('Streamed') != -1 || 
                         vid_dom.getElementById('overlays').textContent.search('LIVE') != -1 || 
                         vid_dom.getElementById('video-badges').textContent.search('LIVE NOW') != -1)
@@ -221,11 +217,10 @@ function applyFilters() {
                 (continue_watching && progress >= 15 && progress <= 80) ||
                 (finished && progress > 80)
             )
-        ) {
+        ) 
             vid.style.display = 'inline-block'
-        } else {
+        else 
             vid.style.display = 'none'
-        }
     }
 }
 
@@ -234,20 +229,17 @@ function passesWhiteList(channel, title) {
     for (obj of white_list) {
         if (channel == obj.channel.toLowerCase()) {
             isChannelInWhiteList = true
-            if (title.search(obj.title.toLowerCase()) != -1) {
+            if (title.search(obj.title.toLowerCase()) != -1) 
                 return true
-            }
         }
     }
     return !isChannelInWhiteList
 }
 
 function passesBlackList(channel, title) {
-    for (obj of black_list) {
-        if (channel == obj.channel.toLowerCase() && title.search(obj.title.toLowerCase()) != -1) {
+    for (obj of black_list)
+        if (channel == obj.channel.toLowerCase() && title.search(obj.title.toLowerCase()) != -1) 
             return false
-        }
-    }
     return true
 }
 
@@ -257,8 +249,7 @@ function applyChannelFilters() {
         let vid_dom = new DOMParser().parseFromString(vid.innerHTML, 'text/html')
         let channel = vid_dom.getElementById('channel-name').getElementsByTagName('a')[0].textContent.toLowerCase()
         let title = vid_dom.getElementById('video-title').textContent.toLowerCase()
-        if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
+        if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) 
             vid.remove()
-        }
     }
 }

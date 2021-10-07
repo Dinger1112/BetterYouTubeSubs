@@ -1,11 +1,42 @@
 .list_container {
-    padding: 20px;
+    margin: 0px 20px;
 }
 
 button {
     visibility: hidden;
 }
 
+li {
+    display: table;
+}
+
+input {
+    margin-right: 10px;
+}
+
+input[type="button"] {
+    cursor: pointer;
+}
+
 li:hover > button {
     visibility: visible;
+    margin-left: 10px;
+}
+
+#import, #export {
+    display: none;
+}
+
+.port_container {
+    margin: 20px;
+}
+
+.port_container label {
+    background-color: rgb(233, 233, 233);
+    cursor: pointer;
+    border: gray solid 1px;
+    border-radius: 4px;
+    padding: 4px;
+    margin-right: 4px;
+    font-weight: 600;
 }
