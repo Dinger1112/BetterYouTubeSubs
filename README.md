@@ -1,6 +1,6 @@
 # BetterYoutubeSubs
 Filter the videos that show up in your YouTube subscription feed to better manage the content you want to watch. <br>
-Supported browsers: Firefox
+Firefox: https://addons.mozilla.org/en-US/firefox/addon/better-youtube-subs/
 
 ## Features
 ### Filter by
