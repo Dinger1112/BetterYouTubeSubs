@@ -245,11 +245,13 @@ function passesBlackList(channel, title) {
 
 function applyChannelFilters() {
     let vids = subs_dom.getElementsByTagName('ytd-grid-video-renderer')
-    for (let vid of vids) {
-        let vid_dom = new DOMParser().parseFromString(vid.innerHTML, 'text/html')
-        let channel = vid_dom.getElementById('channel-name').getElementsByTagName('a')[0].textContent.toLowerCase()
-        let title = vid_dom.getElementById('video-title').textContent.toLowerCase()
-        if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) 
-            vid.remove()
+    for (let i = 0; i < vids.length; i++) {
+        let vid_dom = new DOMParser().parseFromString(vids[i].innerHTML, 'text/html')
+        let channel = vid_dom.links[2].textContent.toLowerCase()
+        let title = vid_dom.links[1].title.toLowerCase()
+        if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
+            vids[i].remove()
+            i--
+        }
     }
 }
