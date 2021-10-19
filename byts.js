@@ -23,9 +23,6 @@ window.addEventListener('yt-navigate-finish', () => {
     }
 })
 
-if (!is_setup && window.location.pathname == '/feed/subscriptions') 
-    setup()
-
 function setup() {
     let ytd_browse_list = document.getElementById('page-manager').getElementsByTagName('ytd-browse')
     for (ytd_browse of ytd_browse_list) {
@@ -222,6 +219,8 @@ function applyFilters() {
         else 
             vid.style.display = 'none'
     }
+    window.scrollBy(0, 1)
+    window.scrollBy(0,-1)
 }
 
 function passesWhiteList(channel, title) {
