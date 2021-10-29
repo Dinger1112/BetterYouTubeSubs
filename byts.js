@@ -10,6 +10,9 @@ let finished = true
 let white_list = []
 let black_list = []
 
+if (window.location.pathname == '/feed/subscriptions') 
+    setup()
+
 window.addEventListener('yt-navigate-finish', () => {
     if (window.location.pathname == '/feed/subscriptions') {
         if(!is_setup) 
@@ -219,8 +222,9 @@ function applyFilters() {
         else 
             vid.style.display = 'none'
     }
-    window.scrollBy(0, 1)
-    window.scrollBy(0,-1)
+    let guide = document.getElementById('guide-inner-content')
+    guide.scrollBy(0, 1)
+    guide.scrollBy(0,-1)
 }
 
 function passesWhiteList(channel, title) {
