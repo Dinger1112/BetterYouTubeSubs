@@ -1,12 +1,11 @@
 let subs_dom
 let is_setup = false
-
 let videos = true
 let live_streams = true
 let unwatched = true
 let continue_watching = true
 let finished = true
-
+let grid_mode = true
 let white_list = []
 let black_list = []
 
@@ -21,25 +20,30 @@ window.addEventListener('yt-navigate-finish', () => {
             setTimeout(() => {
                 applyFilters()
                 applyChannelFilters()
-            }, 1000);
+            }, 1000)
         }
     }
 })
 
 function setup() {
-    let ytd_browse_list = document.getElementById('page-manager').getElementsByTagName('ytd-browse')
-    for (ytd_browse of ytd_browse_list) {
-        if (ytd_browse.getAttribute('page-subtype') == 'subscriptions') {
-            subs_dom = ytd_browse
-            break
-        }
-    }
+    subs_dom = document.querySelector('ytd-browse[page-subtype="subscriptions"]')
     
     browser.storage.sync.get().then((value) => {
         if (value.white_list != undefined) {
             white_list = value.white_list
             black_list = value.black_list
             applyChannelFilters()
+            new MutationObserver((mutations) => {
+                let nodes = mutations[0].addedNodes
+                for (let node of nodes) {
+                    if (node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
+                        setTimeout(() => {
+                            applyFilters()
+                            applyChannelFilters()
+                        }, 1000)
+                    }
+                }
+            }).observe(subs_dom.querySelector('#contents'), {childList: true})
         }
     })
 
@@ -163,14 +167,7 @@ function setup() {
     status.appendChild(show_status)
     status.appendChild(type_status)
 
-    let title_container 
-    let divs = subs_dom.getElementsByTagName('div')
-    for (let div of divs) {
-        if(div.id == 'title-container') {
-            title_container = div
-            break
-        }
-    }
+    let title_container = subs_dom.querySelector('#title-container')
     title_container.insertBefore(show, title_container.childNodes[5])
     title_container.insertBefore(type, title_container.childNodes[5])
     title_container.insertBefore(status, title_container.childNodes[5])
@@ -182,45 +179,50 @@ function setup() {
         }
     })
 
-    for (let div of divs) {
-        if(div.id == 'contents') {
-            new MutationObserver((mutations) => {
-                if (mutations[0].addedNodes.length > 1) {
-                    setTimeout(() => {
-                        applyFilters()
-                        applyChannelFilters()
-                    }, 1000);
-                }
-            }).observe(div, {childList: true})
-            break
-        }
-    }
+    let title_buttons = title_container.getElementsByTagName('ytd-button-renderer')
+    title_buttons[1].addEventListener('click', () => {grid_mode = true})
+    title_buttons[2].addEventListener('click', () => {grid_mode = false})
 
     is_setup = true
 }
 
 function applyFilters() {
-    let vids = subs_dom.getElementsByTagName('ytd-grid-video-renderer')
+    let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-grid-video-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    if (vids.length == 0) {
+        vids = subs_dom.getElementsByTagName('ytd-video-renderer')
+        grid_mode = false
+    }
     for (let vid of vids) {
-        let vid_dom = new DOMParser().parseFromString(vid.innerHTML, 'text/html')
-        let progress = vid_dom.getElementById('progress')
+        let progress = vid.querySelector('#progress')
         try {progress = progress.style.width.slice(0, -1)}
         catch(err) {progress = 0}
-        let is_live = (vid_dom.getElementById('meta').textContent.search('Streamed') != -1 || 
-                        vid_dom.getElementById('overlays').textContent.search('LIVE') != -1 || 
-                        vid_dom.getElementById('video-badges').textContent.search('LIVE NOW') != -1)
-        if ((
-                (videos && !is_live) ||
-                (live_streams && is_live)
-            ) && (
-                (unwatched && progress < 15) ||
-                (continue_watching && progress >= 15 && progress <= 80) ||
-                (finished && progress > 80)
-            )
-        ) 
-            vid.style.display = 'inline-block'
-        else 
-            vid.style.display = 'none'
+        let is_live = (vid.querySelector('#metadata-line').textContent.search('Streamed') != -1 || 
+                        vid.querySelector('#overlays').textContent.search('LIVE') != -1 || 
+                        (grid_mode ? vid.querySelector('#video-badges').textContent.search('LIVE NOW') != -1 : vid.querySelector('#badges').textContent.search('LIVE NOW') != -1))
+        if (((videos && !is_live) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
+            if (grid_mode)
+                vid.style.display = 'inline-block'
+            else {
+                let item_section_renderer = vid.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+                if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)){
+                    vid.parentNode.parentNode.parentNode.style.display = 'block'
+                    item_section_renderer.querySelector('#image-container').style.display = 'flex'
+                } else
+                    item_section_renderer.style.display = 'block'
+            }
+        }
+        else {
+            if (grid_mode)
+                vid.style.display = 'none'
+            else {
+                let item_section_renderer = vid.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+                if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
+                    vid.parentNode.parentNode.parentNode.style.display = 'none'
+                    item_section_renderer.querySelector('#image-container').style.display = 'none'
+                } else
+                    item_section_renderer.style.display = 'none'
+            }
+        }
     }
     let guide = document.getElementById('guide-inner-content')
     guide.scrollBy(0, 1)
@@ -229,7 +231,7 @@ function applyFilters() {
 
 function passesWhiteList(channel, title) {
     let isChannelInWhiteList = false
-    for (obj of white_list) {
+    for (let obj of white_list) {
         if (channel == obj.channel.toLowerCase()) {
             isChannelInWhiteList = true
             if (title.search(obj.title.toLowerCase()) != -1) 
@@ -240,20 +242,32 @@ function passesWhiteList(channel, title) {
 }
 
 function passesBlackList(channel, title) {
-    for (obj of black_list)
+    for (let obj of black_list)
         if (channel == obj.channel.toLowerCase() && title.search(obj.title.toLowerCase()) != -1) 
             return false
     return true
 }
 
 function applyChannelFilters() {
-    let vids = subs_dom.getElementsByTagName('ytd-grid-video-renderer')
+    let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-grid-video-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    if (vids.length == 0) {
+        vids = subs_dom.getElementsByTagName('ytd-video-renderer')
+        grid_mode = false
+    }
     for (let i = 0; i < vids.length; i++) {
-        let vid_dom = new DOMParser().parseFromString(vids[i].innerHTML, 'text/html')
-        let channel = vid_dom.links[2].textContent.toLowerCase()
-        let title = vid_dom.links[1].title.toLowerCase()
+        let channel = vids[i].querySelector('#channel-name').innerText.toLowerCase()
+        let title = vids[i].querySelector('#video-title').innerText.toLowerCase()
         if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
-            vids[i].remove()
+            if (grid_mode)
+                vids[i].remove()
+            else {
+                let item_section_renderer = vids[i].parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+                if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
+                    vids[i].parentNode.parentNode.parentNode.remove()
+                    item_section_renderer.querySelector('#image-container').remove()
+                } else
+                    item_section_renderer.querySelector('#contents').remove()
+            }
             i--
         }
     }
