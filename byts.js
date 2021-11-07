@@ -205,10 +205,12 @@ function applyFilters() {
             else {
                 let item_section_renderer = vid.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
                 if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)){
-                    vid.parentNode.parentNode.parentNode.style.display = 'block'
+                    vid.parentNode.parentNode.style.display = 'block'
                     item_section_renderer.querySelector('#image-container').style.display = 'flex'
-                } else
+                } else {
+                    vid.parentNode.parentNode.style.display = 'block'
                     item_section_renderer.style.display = 'block'
+                }
             }
         }
         else {
@@ -217,7 +219,7 @@ function applyFilters() {
             else {
                 let item_section_renderer = vid.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
                 if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
-                    vid.parentNode.parentNode.parentNode.style.display = 'none'
+                    vid.parentNode.parentNode.style.display = 'none'
                     item_section_renderer.querySelector('#image-container').style.display = 'none'
                 } else
                     item_section_renderer.style.display = 'none'
@@ -255,7 +257,7 @@ function applyChannelFilters() {
         grid_mode = false
     }
     for (let i = 0; i < vids.length; i++) {
-        let channel = vids[i].querySelector('#channel-name').innerText.toLowerCase()
+        let channel = vids[i].querySelector('#channel-name').querySelector('a').innerText.toLowerCase()
         let title = vids[i].querySelector('#video-title').innerText.toLowerCase()
         if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
             if (grid_mode)
@@ -263,7 +265,7 @@ function applyChannelFilters() {
             else {
                 let item_section_renderer = vids[i].parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
                 if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
-                    vids[i].parentNode.parentNode.parentNode.remove()
+                    vids[i].parentNode.parentNode.remove()
                     item_section_renderer.querySelector('#image-container').remove()
                 } else
                     item_section_renderer.querySelector('#contents').remove()
