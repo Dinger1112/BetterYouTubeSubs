@@ -226,9 +226,11 @@ function applyFilters() {
             }
         }
     }
-    let guide = document.getElementById('guide-inner-content')
-    guide.scrollBy(0, 1)
-    guide.scrollBy(0,-1)
+    let cont_item_rend = subs_dom.querySelector('ytd-continuation-item-renderer')
+    cont_item_rend.style.height = '1000px'
+    window.scrollBy(0, 1)
+    window.scrollBy(0,-1)
+    cont_item_rend.style.height = 'initial'
 }
 
 function passesWhiteList(channel, title) {
