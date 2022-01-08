@@ -33,18 +33,18 @@ function setup() {
             white_list = value.white_list
             black_list = value.black_list
             applyChannelFilters()
-            new MutationObserver((mutations) => {
-                let nodes = mutations[0].addedNodes
-                for (let node of nodes) {
-                    if (node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
-                        setTimeout(() => {
-                            applyFilters()
-                            applyChannelFilters()
-                        }, 1000)
-                    }
-                }
-            }).observe(subs_dom.querySelector('#contents'), {childList: true})
         }
+        new MutationObserver((mutations) => {
+            let nodes = mutations[0].addedNodes
+            for (let node of nodes) {
+                if (node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
+                    setTimeout(() => {
+                        applyFilters()
+                        applyChannelFilters()
+                    }, 1000)
+                }
+            }
+        }).observe(subs_dom.querySelector('#contents'), {childList: true})
     })
 
     let show = document.createElement('div')
