@@ -22,6 +22,9 @@ window.addEventListener('yt-navigate-finish', () => {
                 applyChannelFilters()
             }, 1000)
         }
+    } else {
+        for (let vid of document.getElementsByTagName('ytd-grid-video-renderer'))
+            vid.style.display = 'inline-block'
     }
 })
 
