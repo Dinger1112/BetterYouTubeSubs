@@ -9,14 +9,16 @@ let grid_mode = true
 let white_list = []
 let black_list = []
 
-if (window.location.pathname == '/feed/subscriptions') 
-    setup()
-
 window.addEventListener('yt-navigate-finish', () => {
     if (window.location.pathname == '/feed/subscriptions') {
         if(!is_setup) 
             setup()
         else {
+            if (subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
+                'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z')
+                grid_mode = true
+            else
+                grid_mode = false
             setTimeout(() => {
                 applyFilters()
                 applyChannelFilters()
@@ -182,19 +184,11 @@ function setup() {
         }
     })
 
-    let title_buttons = title_container.getElementsByTagName('ytd-button-renderer')
-    title_buttons[1].addEventListener('click', () => {grid_mode = true})
-    title_buttons[2].addEventListener('click', () => {grid_mode = false})
-
     is_setup = true
 }
 
 function applyFilters() {
     let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-grid-video-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
-    if (vids.length == 0) {
-        vids = subs_dom.getElementsByTagName('ytd-video-renderer')
-        grid_mode = false
-    }
     for (let vid of vids) {
         let progress = vid.querySelector('#progress')
         try {progress = progress.style.width.slice(0, -1)}
@@ -257,10 +251,6 @@ function passesBlackList(channel, title) {
 
 function applyChannelFilters() {
     let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-grid-video-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
-    if (vids.length == 0) {
-        vids = subs_dom.getElementsByTagName('ytd-video-renderer')
-        grid_mode = false
-    }
     for (let i = 0; i < vids.length; i++) {
         let channel = vids[i].querySelector('#channel-name').querySelector('a').innerText.toLowerCase()
         let title = vids[i].querySelector('#video-title').innerText.toLowerCase()
