@@ -38,3 +38,8 @@
 .type_status {
     padding: 18px 16px 16px 3px;
 }
+
+button {
+    width: 12px;
+    height: 12px;
+}

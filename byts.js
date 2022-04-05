@@ -160,6 +160,18 @@ function setup() {
     type.appendChild(type_btn)
     type.appendChild(type_dropdown)
 
+    let favorite = document.createElement('button')
+    favorite.onclick = () => {
+        videos = true
+        live_streams = false
+        unwatched = true
+        continue_watching = false
+        finished = false
+        type_status.innerText = 'VIDEOS'
+        show_status.innerText = 'UNWATCHED'
+        applyFilters()
+    }
+
     let status = document.createElement('div')
     status.classList.add('status')
 
@@ -175,6 +187,7 @@ function setup() {
     let title_container = subs_dom.querySelector('#title-container')
     title_container.insertBefore(show, title_container.childNodes[5])
     title_container.insertBefore(type, title_container.childNodes[5])
+    title_container.insertBefore(favorite, title_container.childNodes[5])
     title_container.insertBefore(status, title_container.childNodes[5])
 
     window.addEventListener('click', (event) => {
