@@ -171,6 +171,7 @@ function setup() {
         show_status.innerText = 'UNWATCHED'
         applyFilters()
     }
+    favorite.innerText = '★'
 
     let status = document.createElement('div')
     status.classList.add('status')
