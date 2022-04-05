@@ -42,7 +42,7 @@
 button {
     background-color: transparent;
     border: none;
-    padding: 16px;
+    padding: 11px 16px 16px 16px;
     cursor: pointer;
     color: white;
     font-size: 20px;
