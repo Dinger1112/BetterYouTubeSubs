@@ -1,11 +1,23 @@
 let subs_dom
 let is_setup = false
+
 let videos = true
 let live_streams = true
 let unwatched = true
 let continue_watching = true
 let finished = true
+
+let videos_prev = true
+let live_streams_prev = true
+let unwatched_prev = true
+let continue_watching_prev = true
+let finished_prev = true
+let type_status_prev = ''
+let show_status_prev = ''
+
 let grid_mode = true
+let favorite_active = false
+
 let white_list = []
 let black_list = []
 
@@ -162,16 +174,36 @@ function setup() {
 
     let favorite = document.createElement('button')
     favorite.onclick = () => {
-        videos = true
-        live_streams = false
-        unwatched = true
-        continue_watching = false
-        finished = false
-        type_status.innerText = 'VIDEOS'
-        show_status.innerText = 'UNWATCHED'
+        if (favorite_active) {
+            videos = videos_prev
+            live_streams = live_streams_prev
+            continue_watching = continue_watching_prev
+            finished = finished_prev
+            type_status.innerText = type_status_prev
+            show_status.innerText = type_status_prev
+            favorite.innerText = '☆'
+        }
+        else {
+            videos_prev = videos
+            live_streams_prev = live_streams
+            unwatched_prev = unwatched
+            continue_watching_prev = continue_watching
+            finished_prev = finished
+            type_status_prev = type_status
+            show_status_prev = show_status
+            videos = true
+            live_streams = false
+            unwatched = true
+            continue_watching = false
+            finished = false
+            type_status.innerText = 'VIDEOS'
+            show_status.innerText = 'UNWATCHED'
+            favorite.innerText = '★'
+        }
+        favorite_active = !favorite_active
         applyFilters()
     }
-    favorite.innerText = '★'
+    favorite.innerText = '☆'
 
     let status = document.createElement('div')
     status.classList.add('status')
