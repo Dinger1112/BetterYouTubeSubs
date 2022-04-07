@@ -1,5 +1,7 @@
 let subs_dom
 let is_setup = false
+let grid_mode = true
+let favorite_active = false
 
 let videos = true
 let live_streams = true
@@ -14,9 +16,6 @@ let continue_watching_prev = true
 let finished_prev = true
 let type_status_prev = ''
 let show_status_prev = ''
-
-let grid_mode = true
-let favorite_active = false
 
 let white_list = []
 let black_list = []
@@ -85,6 +84,8 @@ function setup() {
         continue_watching = true
         finished = true
         show_status.innerText = ''
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -95,6 +96,8 @@ function setup() {
         continue_watching = false
         finished = false
         show_status.innerText = 'UNWATCHED'
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -105,6 +108,8 @@ function setup() {
         continue_watching = true
         finished = false
         show_status.innerText = 'CONTINUE WATCHING'
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -115,6 +120,8 @@ function setup() {
         continue_watching = false
         finished = true
         show_status.innerText = 'FINISHED'
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -145,6 +152,8 @@ function setup() {
         videos = true
         live_streams = true
         type_status.innerText = ''
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -154,6 +163,8 @@ function setup() {
         videos = true
         live_streams = false
         type_status.innerText = 'VIDEOS'
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -163,6 +174,8 @@ function setup() {
         videos = false
         live_streams = true
         type_status.innerText = 'LIVE STREAMS'
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -180,7 +193,7 @@ function setup() {
             continue_watching = continue_watching_prev
             finished = finished_prev
             type_status.innerText = type_status_prev
-            show_status.innerText = type_status_prev
+            show_status.innerText = show_status_prev
             favorite.innerText = '☆'
         }
         else {
@@ -189,8 +202,8 @@ function setup() {
             unwatched_prev = unwatched
             continue_watching_prev = continue_watching
             finished_prev = finished
-            type_status_prev = type_status
-            show_status_prev = show_status
+            type_status_prev = type_status.innerText
+            show_status_prev = show_status.innerText
             videos = true
             live_streams = false
             unwatched = true
