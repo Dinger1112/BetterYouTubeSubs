@@ -7,6 +7,8 @@ const white_btn = document.getElementById('white_btn')
 const black_btn = document.getElementById('black_btn')
 const export_btn = document.getElementById('export')
 const import_btn = document.getElementById('import')
+const type = document.getElementById('type')
+const show = document.getElementById('show')
 
 white_btn.addEventListener('click', () => {
     let channel_input = document.getElementById('white_channel_input')
@@ -87,6 +89,14 @@ import_btn.addEventListener('change', () => {
     })
 })
 
+type_opt.addEventListener('change', () => {
+    browser.storage.sync.set({type: type.value})
+})
+
+show_opt.addEventListener('change', () => {
+    browser.storage.sync.set({show: show.value})
+})
+
 browser.storage.sync.get().then((value) => {
     if (value.white_list != undefined){
         white_list = value.white_list
@@ -97,11 +107,24 @@ browser.storage.sync.get().then((value) => {
             black_list: []
         })
     }
+    if (value.type != undefined) {
+        let t = value.type
+        //for (let i = 0; type.size)
+    } else {
+
+    }
+    if (value.show != undefined) {
+
+    } else {
+         
+    }
 }).then(() => {
     for (let i of white_list) 
         ul_white.appendChild(createLI(i.channel, i.title))
     for (let i of black_list) 
         ul_black.appendChild(createLI(i.channel, i.title))
+    // browser.storage.sync.set({type: type.value})
+    // browser.storage.sync.set({show: show.value})
 })
 
 function createLI(channel, title) {
