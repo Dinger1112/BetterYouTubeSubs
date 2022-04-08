@@ -89,11 +89,11 @@ import_btn.addEventListener('change', () => {
     })
 })
 
-type_opt.addEventListener('change', () => {
+type.addEventListener('change', () => {
     browser.storage.sync.set({type: type.value})
 })
 
-show_opt.addEventListener('change', () => {
+show.addEventListener('change', () => {
     browser.storage.sync.set({show: show.value})
 })
 
@@ -109,7 +109,9 @@ browser.storage.sync.get().then((value) => {
     }
     if (value.type != undefined) {
         let t = value.type
-        //for (let i = 0; type.size)
+        for (let i = 0; i < type.size; i++) {
+            
+        }
     } else {
 
     }
@@ -123,8 +125,6 @@ browser.storage.sync.get().then((value) => {
         ul_white.appendChild(createLI(i.channel, i.title))
     for (let i of black_list) 
         ul_black.appendChild(createLI(i.channel, i.title))
-    // browser.storage.sync.set({type: type.value})
-    // browser.storage.sync.set({show: show.value})
 })
 
 function createLI(channel, title) {
