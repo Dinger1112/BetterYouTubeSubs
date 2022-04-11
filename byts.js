@@ -19,6 +19,8 @@ let show_status_prev = ''
 
 let white_list = []
 let black_list = []
+let fav_type = "Videos"
+let fav_show = "Unwatched"
 
 window.addEventListener('yt-navigate-finish', () => {
     if (window.location.pathname == '/feed/subscriptions') {
@@ -50,6 +52,10 @@ function setup() {
             black_list = value.black_list
             applyChannelFilters()
         }
+        if (value.type != undefined) 
+            fav_type = value.type
+        if (value.show != undefined)
+            fav_show = value.show
         new MutationObserver((mutations) => {
             let nodes = mutations[0].addedNodes
             for (let node of nodes) {
@@ -190,6 +196,7 @@ function setup() {
         if (favorite_active) {
             videos = videos_prev
             live_streams = live_streams_prev
+            unwatched = unwatched_prev
             continue_watching = continue_watching_prev
             finished = finished_prev
             type_status.innerText = type_status_prev
@@ -204,13 +211,49 @@ function setup() {
             finished_prev = finished
             type_status_prev = type_status.innerText
             show_status_prev = show_status.innerText
-            videos = true
-            live_streams = false
-            unwatched = true
-            continue_watching = false
-            finished = false
-            type_status.innerText = 'VIDEOS'
-            show_status.innerText = 'UNWATCHED'
+            switch (fav_type) {
+                case 'All':
+                    videos = true
+                    live_streams = true
+                    type_status.innerText = ''
+                    break
+                case 'Videos':
+                    videos = true
+                    live_streams = false
+                    type_status.innerText = 'VIDEOS'
+                    break
+                case 'Live Streams':
+                    videos = false
+                    live_streams = true
+                    type_status.innerText = 'LIVE STREAMS'
+                    break
+            }
+            switch (fav_show) {
+                case 'All':
+                    unwatched = true
+                    continue_watching = true
+                    finished = true
+                    show_status.innerText = ''
+                    break
+                case 'Unwatched':
+                    unwatched = true
+                    continue_watching = false
+                    finished = false
+                    show_status.innerText = 'UNWATCHED'
+                    break
+                case 'Continue Watching':
+                    unwatched = false
+                    continue_watching = true
+                    finished = false
+                    show_status.innerText = 'CONTINUE WATCHING'
+                    break
+                case 'Finished':
+                    unwatched = false
+                    continue_watching = false
+                    finished = true
+                    show_status.innerText = 'FINISHED'
+                    break
+            }
             favorite.innerText = '★'
         }
         favorite_active = !favorite_active

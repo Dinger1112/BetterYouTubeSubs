@@ -109,17 +109,17 @@ browser.storage.sync.get().then((value) => {
         white_list = []
         black_list = []
     }
-    if (value.type != undefined) {
+    if (value.type != undefined) 
         type.value = value.type
-    } else {
-        browser.storage.sync.set({type: type.value})
+    else {
         type.value = 'Videos'
+        browser.storage.sync.set({type: type.value})
     }
-    if (value.show != undefined) {
+    if (value.show != undefined) 
         show.value = value.show
-    } else {
-        browser.storage.sync.set({show: show.value})
+    else {
         show.value = 'Unwatched'
+        browser.storage.sync.set({show: show.value})
     }
 }).then(() => {
     for (let i of white_list) 
