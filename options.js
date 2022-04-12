@@ -7,6 +7,8 @@ const white_btn = document.getElementById('white_btn')
 const black_btn = document.getElementById('black_btn')
 const export_btn = document.getElementById('export')
 const import_btn = document.getElementById('import')
+const type = document.getElementById('type')
+const show = document.getElementById('show')
 
 white_btn.addEventListener('click', () => {
     let channel_input = document.getElementById('white_channel_input')
@@ -87,6 +89,14 @@ import_btn.addEventListener('change', () => {
     })
 })
 
+type.addEventListener('change', () => {
+    browser.storage.sync.set({type: type.value})
+})
+
+show.addEventListener('change', () => {
+    browser.storage.sync.set({show: show.value})
+})
+
 browser.storage.sync.get().then((value) => {
     if (value.white_list != undefined){
         white_list = value.white_list
@@ -96,6 +106,20 @@ browser.storage.sync.get().then((value) => {
             white_list: [],
             black_list: []
         })
+        white_list = []
+        black_list = []
+    }
+    if (value.type != undefined) 
+        type.value = value.type
+    else {
+        type.value = 'Videos'
+        browser.storage.sync.set({type: type.value})
+    }
+    if (value.show != undefined) 
+        show.value = value.show
+    else {
+        show.value = 'Unwatched'
+        browser.storage.sync.set({show: show.value})
     }
 }).then(() => {
     for (let i of white_list) 

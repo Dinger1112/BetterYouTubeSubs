@@ -1,13 +1,26 @@
 let subs_dom
 let is_setup = false
+let grid_mode = true
+let favorite_active = false
+
 let videos = true
 let live_streams = true
 let unwatched = true
 let continue_watching = true
 let finished = true
-let grid_mode = true
+
+let videos_prev = true
+let live_streams_prev = true
+let unwatched_prev = true
+let continue_watching_prev = true
+let finished_prev = true
+let type_status_prev = ''
+let show_status_prev = ''
+
 let white_list = []
 let black_list = []
+let fav_type = "Videos"
+let fav_show = "Unwatched"
 
 window.addEventListener('yt-navigate-finish', () => {
     if (window.location.pathname == '/feed/subscriptions') {
@@ -39,6 +52,10 @@ function setup() {
             black_list = value.black_list
             applyChannelFilters()
         }
+        if (value.type != undefined) 
+            fav_type = value.type
+        if (value.show != undefined)
+            fav_show = value.show
         new MutationObserver((mutations) => {
             let nodes = mutations[0].addedNodes
             for (let node of nodes) {
@@ -73,6 +90,8 @@ function setup() {
         continue_watching = true
         finished = true
         show_status.innerText = ''
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -83,6 +102,8 @@ function setup() {
         continue_watching = false
         finished = false
         show_status.innerText = 'UNWATCHED'
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -93,6 +114,8 @@ function setup() {
         continue_watching = true
         finished = false
         show_status.innerText = 'CONTINUE WATCHING'
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -103,6 +126,8 @@ function setup() {
         continue_watching = false
         finished = true
         show_status.innerText = 'FINISHED'
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -133,6 +158,8 @@ function setup() {
         videos = true
         live_streams = true
         type_status.innerText = ''
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -142,6 +169,8 @@ function setup() {
         videos = true
         live_streams = false
         type_status.innerText = 'VIDEOS'
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -151,6 +180,8 @@ function setup() {
         videos = false
         live_streams = true
         type_status.innerText = 'LIVE STREAMS'
+        favorite_active = false
+        favorite.innerText = '☆'
         applyFilters()
     }
 
@@ -159,6 +190,76 @@ function setup() {
     type_dropdown.appendChild(type_live)
     type.appendChild(type_btn)
     type.appendChild(type_dropdown)
+
+    let favorite = document.createElement('button')
+    favorite.onclick = () => {
+        if (favorite_active) {
+            videos = videos_prev
+            live_streams = live_streams_prev
+            unwatched = unwatched_prev
+            continue_watching = continue_watching_prev
+            finished = finished_prev
+            type_status.innerText = type_status_prev
+            show_status.innerText = show_status_prev
+            favorite.innerText = '☆'
+        }
+        else {
+            videos_prev = videos
+            live_streams_prev = live_streams
+            unwatched_prev = unwatched
+            continue_watching_prev = continue_watching
+            finished_prev = finished
+            type_status_prev = type_status.innerText
+            show_status_prev = show_status.innerText
+            switch (fav_type) {
+                case 'All':
+                    videos = true
+                    live_streams = true
+                    type_status.innerText = ''
+                    break
+                case 'Videos':
+                    videos = true
+                    live_streams = false
+                    type_status.innerText = 'VIDEOS'
+                    break
+                case 'Live Streams':
+                    videos = false
+                    live_streams = true
+                    type_status.innerText = 'LIVE STREAMS'
+                    break
+            }
+            switch (fav_show) {
+                case 'All':
+                    unwatched = true
+                    continue_watching = true
+                    finished = true
+                    show_status.innerText = ''
+                    break
+                case 'Unwatched':
+                    unwatched = true
+                    continue_watching = false
+                    finished = false
+                    show_status.innerText = 'UNWATCHED'
+                    break
+                case 'Continue Watching':
+                    unwatched = false
+                    continue_watching = true
+                    finished = false
+                    show_status.innerText = 'CONTINUE WATCHING'
+                    break
+                case 'Finished':
+                    unwatched = false
+                    continue_watching = false
+                    finished = true
+                    show_status.innerText = 'FINISHED'
+                    break
+            }
+            favorite.innerText = '★'
+        }
+        favorite_active = !favorite_active
+        applyFilters()
+    }
+    favorite.innerText = '☆'
 
     let status = document.createElement('div')
     status.classList.add('status')
@@ -175,6 +276,7 @@ function setup() {
     let title_container = subs_dom.querySelector('#title-container')
     title_container.insertBefore(show, title_container.childNodes[5])
     title_container.insertBefore(type, title_container.childNodes[5])
+    title_container.insertBefore(favorite, title_container.childNodes[5])
     title_container.insertBefore(status, title_container.childNodes[5])
 
     window.addEventListener('click', (event) => {
