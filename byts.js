@@ -337,7 +337,7 @@ function passesWhiteList(channel, title) {
     for (let obj of white_list) {
         if (channel == obj.channel.toLowerCase()) {
             isChannelInWhiteList = true
-            if (title.search(obj.title.toLowerCase()) != -1) 
+            if (title.search('\\b' + obj.title.toLowerCase() + '\\b') != -1) 
                 return true
         }
     }
@@ -346,7 +346,7 @@ function passesWhiteList(channel, title) {
 
 function passesBlackList(channel, title) {
     for (let obj of black_list)
-        if (channel == obj.channel.toLowerCase() && title.search(obj.title.toLowerCase()) != -1) 
+        if (channel == obj.channel.toLowerCase() && title.search('\\b' + obj.title.toLowerCase() + '\\b') != -1) 
             return false
     return true
 }
