@@ -1,6 +1,5 @@
 let subs_dom
 let is_setup = false
-let grid_mode = true
 let favorite_active = false
 
 let videos = true
@@ -27,11 +26,7 @@ window.addEventListener('yt-navigate-finish', () => {
         if(!is_setup) 
             setup()
         else {
-            if (subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
-                'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z')
-                grid_mode = true
-            else
-                grid_mode = false
+            
             setTimeout(() => {
                 applyFilters()
                 applyChannelFilters()
@@ -290,6 +285,8 @@ function setup() {
 }
 
 function applyFilters() {
+    let grid_mode = subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
+        'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z' 
     let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-grid-video-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
     for (let vid of vids) {
         let progress = vid.querySelector('#progress')
@@ -352,6 +349,8 @@ function passesBlackList(channel, title) {
 }
 
 function applyChannelFilters() {
+    let grid_mode = subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
+        'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z'  
     let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-grid-video-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
     for (let i = 0; i < vids.length; i++) {
         let channel = vids[i].querySelector('#channel-name').querySelector('a').innerText.toLowerCase()
