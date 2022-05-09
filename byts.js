@@ -61,7 +61,7 @@ function setup() {
                         setTimeout(() => {
                             applyFilters()
                             applyChannelFilters()
-                        }, 2000)
+                        }, 3000)
                 }
             }
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
