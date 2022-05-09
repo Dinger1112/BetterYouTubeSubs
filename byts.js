@@ -26,7 +26,6 @@ window.addEventListener('yt-navigate-finish', () => {
         if(!is_setup) 
             setup()
         else {
-            
             setTimeout(() => {
                 applyFilters()
                 applyChannelFilters()
@@ -55,10 +54,14 @@ function setup() {
             let nodes = mutations[0].addedNodes
             for (let node of nodes) {
                 if (node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
-                    setTimeout(() => {
-                        applyFilters()
-                        applyChannelFilters()
-                    }, 1000)
+                        setTimeout(() => {
+                            applyFilters()
+                            applyChannelFilters()
+                        }, 1000)
+                        setTimeout(() => {
+                            applyFilters()
+                            applyChannelFilters()
+                        }, 2000)
                 }
             }
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
