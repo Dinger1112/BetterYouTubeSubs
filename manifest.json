@@ -2,7 +2,7 @@
 
   "manifest_version": 2,
   "name": "Better YouTube Subs",
-  "version": "1.2.3",
+  "version": "1.2.2",
   "permissions": ["storage"],
 
   "description": "Adds new functionality to YouTube's subscription page.",
