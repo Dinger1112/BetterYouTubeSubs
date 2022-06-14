@@ -61,7 +61,7 @@ function setup() {
                         setTimeout(() => {
                             applyFilters()
                             applyChannelFilters()
-                        }, 2000)
+                        }, 3000)
                 }
             }
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
@@ -296,8 +296,8 @@ function applyFilters() {
         try {progress = progress.style.width.slice(0, -1)}
         catch(err) {progress = 0}
         let is_live = (vid.querySelector('#metadata-line').textContent.search('Streamed') != -1 || 
-                        vid.querySelector('#overlays').textContent.search('LIVE') != -1 || 
-                        (grid_mode ? vid.querySelector('#video-badges').textContent.search('LIVE NOW') != -1 : vid.querySelector('#badges').textContent.search('LIVE NOW') != -1))
+                        vid.querySelector('#metadata-line').textContent.search('Scheduled') != -1 || 
+                        (grid_mode ? vid.querySelector('#video-badges').textContent.search('LIVE') != -1 : vid.querySelector('#badges').textContent.search('LIVE') != -1))
         if (((videos && !is_live) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
             if (grid_mode)
                 vid.style.display = 'inline-block'
