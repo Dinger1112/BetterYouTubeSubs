@@ -3,12 +3,14 @@ let is_setup = false
 let favorite_active = false
 
 let videos = true
+let shorts = true
 let live_streams = true
 let unwatched = true
 let continue_watching = true
 let finished = true
 
 let videos_prev = true
+let shorts_prev = true
 let live_streams_prev = true
 let unwatched_prev = true
 let continue_watching_prev = true
@@ -73,13 +75,20 @@ function setup() {
     show_btn.innerText = 'SHOW'
     show_btn.classList.add('btn')
     show_btn.onclick = () => {
-        show_dropdown.classList.toggle('hidden')
-        type_dropdown.classList.add('hidden')
+        if (!(shorts && !videos && !live_streams)) {
+            show_dropdown.classList.toggle('hidden')
+            type_dropdown.classList.add('hidden')
+        }
     }
 
     let show_dropdown = document.createElement('div')
     show_dropdown.classList.add('dropdown_content')
     show_dropdown.classList.add('hidden')
+    show_dropdown.onclick = () => {
+        favorite_active = false
+        favorite.innerText = '☆'
+        applyFilters()
+    }
 
     let show_all = document.createElement('div')
     show_all.innerText = 'All'
@@ -88,9 +97,6 @@ function setup() {
         continue_watching = true
         finished = true
         show_status.innerText = ''
-        favorite_active = false
-        favorite.innerText = '☆'
-        applyFilters()
     }
 
     let show_unwatched = document.createElement('div')
@@ -100,9 +106,6 @@ function setup() {
         continue_watching = false
         finished = false
         show_status.innerText = 'UNWATCHED'
-        favorite_active = false
-        favorite.innerText = '☆'
-        applyFilters()
     }
 
     let show_continue_watching = document.createElement('div')
@@ -112,9 +115,6 @@ function setup() {
         continue_watching = true
         finished = false
         show_status.innerText = 'CONTINUE WATCHING'
-        favorite_active = false
-        favorite.innerText = '☆'
-        applyFilters()
     }
 
     let show_finished = document.createElement('div')
@@ -124,9 +124,6 @@ function setup() {
         continue_watching = false
         finished = true
         show_status.innerText = 'FINISHED'
-        favorite_active = false
-        favorite.innerText = '☆'
-        applyFilters()
     }
 
     show_dropdown.appendChild(show_all)
@@ -149,42 +146,55 @@ function setup() {
     let type_dropdown = document.createElement('div')
     type_dropdown.classList.add('dropdown_content')
     type_dropdown.classList.add('hidden')
+    type_dropdown.onclick = () => {
+        favorite_active = false
+        favorite.innerText = '☆'
+        applyFilters()
+    }
 
     let type_all = document.createElement('div')
     type_all.innerText = 'All'
     type_all.onclick = () => {
         videos = true
+        shorts = true
         live_streams = true
         type_status.innerText = ''
-        favorite_active = false
-        favorite.innerText = '☆'
-        applyFilters()
     }
 
     let type_videos = document.createElement('div')
     type_videos.innerText = 'Videos'
     type_videos.onclick = () => {
         videos = true
+        shorts = false
         live_streams = false
         type_status.innerText = 'VIDEOS'
-        favorite_active = false
-        favorite.innerText = '☆'
-        applyFilters()
+    }
+
+    let type_shorts = document.createElement('div')
+    type_shorts.innerText = 'Shorts'
+    type_shorts.onclick = () => {
+        videos = false
+        shorts = true
+        live_streams = false
+        type_status.innerText = 'SHORTS'
+        unwatched = true
+        continue_watching = true
+        finished = true
+        show_status.innerText = ''
     }
 
     let type_live = document.createElement('div')
     type_live.innerText = 'Live Streams'
     type_live.onclick = () => {
         videos = false
+        shorts = false
         live_streams = true
         type_status.innerText = 'LIVE STREAMS'
-        favorite_active = false
-        favorite.innerText = '☆'
-        applyFilters()
     }
 
     type_dropdown.appendChild(type_all)
     type_dropdown.appendChild(type_videos)
+    type_dropdown.appendChild(type_shorts)
     type_dropdown.appendChild(type_live)
     type.appendChild(type_btn)
     type.appendChild(type_dropdown)
@@ -193,6 +203,7 @@ function setup() {
     favorite.onclick = () => {
         if (favorite_active) {
             videos = videos_prev
+            shorts = shorts_prev
             live_streams = live_streams_prev
             unwatched = unwatched_prev
             continue_watching = continue_watching_prev
@@ -203,6 +214,7 @@ function setup() {
         }
         else {
             videos_prev = videos
+            shorts_prev = shorts
             live_streams_prev = live_streams
             unwatched_prev = unwatched
             continue_watching_prev = continue_watching
@@ -212,16 +224,25 @@ function setup() {
             switch (fav_type) {
                 case 'All':
                     videos = true
+                    shorts = true
                     live_streams = true
                     type_status.innerText = ''
                     break
                 case 'Videos':
                     videos = true
+                    shorts = false
                     live_streams = false
                     type_status.innerText = 'VIDEOS'
                     break
+                case 'Shorts':
+                    videos = false
+                    shorts = true
+                    live_streams = false
+                    type_status.innerText = 'SHORTS'
+                    break
                 case 'Live Streams':
                     videos = false
+                    shorts = false
                     live_streams = true
                     type_status.innerText = 'LIVE STREAMS'
                     break
@@ -298,7 +319,8 @@ function applyFilters() {
         let is_live = (vid.querySelector('#metadata-line').textContent.search('Streamed') != -1 || 
                         vid.querySelector('#metadata-line').textContent.search('Scheduled') != -1 || 
                         (grid_mode ? vid.querySelector('#video-badges').textContent.search('LIVE') != -1 : vid.querySelector('#badges').textContent.search('LIVE') != -1))
-        if (((videos && !is_live) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
+        let is_short = vid.querySelector('#overlays').firstChild.getAttribute('overlay-style') == 'SHORTS'
+        if (((videos && !is_live && !is_short) || (shorts && is_short) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
             if (grid_mode)
                 vid.style.display = 'inline-block'
             else {

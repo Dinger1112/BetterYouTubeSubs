@@ -90,6 +90,12 @@ import_btn.addEventListener('change', () => {
 })
 
 type.addEventListener('change', () => {
+    if (type.value == 'Shorts') {
+        show.value = 'All'
+        show.setAttribute('disabled', '')
+        browser.storage.sync.set({show: show.value})
+    } else 
+        show.removeAttribute('disabled')
     browser.storage.sync.set({type: type.value})
 })
 
