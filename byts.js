@@ -56,24 +56,60 @@ function setup() {
         if (value.show != undefined)
             fav_show = value.show
         if (value.persist == 'Yes') {
-            if (value.videos != undefined)
-                videos = value.videos
-            if (value.shorts != undefined)
-                shorts = value.shorts
-            if (value.live_streams != undefined)
-                live_streams = value.live_streams
-            if (value.unwatched != undefined)
-                unwatched = value.unwatched
-            if (value.continue_watching != undefined)
-                continue_watching = value.continue_watching
-            if (value.finished != undefined)
-                finished = value.finished
-            if (value.show_status != undefined)
-                show_status.innerText = value.show_status
-            if (value.type_status != undefined)
-                type_status.innerText = value.type_status
-            if (value.favorite_icon != undefined)
-                favorite.innerText = value.favorite_icon
+            favorite.innerText = '★'
+            //for some reason these switches don't work if i put it into a function, look into it in the future
+            switch (fav_type) {
+                case 'All':
+                    videos = true
+                    shorts = true
+                    live_streams = true
+                    type_status.innerText = ''
+                    break
+                case 'Videos':
+                    videos = true
+                    shorts = false
+                    live_streams = false
+                    type_status.innerText = 'VIDEOS'
+                    break
+                case 'Shorts':
+                    videos = false
+                    shorts = true
+                    live_streams = false
+                    type_status.innerText = 'SHORTS'
+                    break
+                case 'Live Streams':
+                    videos = false
+                    shorts = false
+                    live_streams = true
+                    type_status.innerText = 'LIVE STREAMS'
+                    break
+            }
+            switch (fav_show) {
+                case 'All':
+                    unwatched = true
+                    continue_watching = true
+                    finished = true
+                    show_status.innerText = ''
+                    break
+                case 'Unwatched':
+                    unwatched = true
+                    continue_watching = false
+                    finished = false
+                    show_status.innerText = 'UNWATCHED'
+                    break
+                case 'Continue Watching':
+                    unwatched = false
+                    continue_watching = true
+                    finished = false
+                    show_status.innerText = 'CONTINUE WATCHING'
+                    break
+                case 'Finished':
+                    unwatched = false
+                    continue_watching = false
+                    finished = true
+                    show_status.innerText = 'FINISHED'
+                    break
+            }
         }
         new MutationObserver((mutations) => {
             let nodes = mutations[0].addedNodes
@@ -110,17 +146,6 @@ function setup() {
     show_dropdown.onclick = () => {
         favorite.innerText = '☆'
         applyFilters()
-        browser.storage.sync.set({
-            videos: videos,
-            shorts: shorts,
-            live_streams: live_streams,
-            unwatched: unwatched,
-            continue_watching: continue_watching,
-            finished: finished,
-            show_status: show_status.innerText,
-            type_status: type_status.innerText,
-            favorite_icon: favorite.innerText
-        })
     }
 
     let show_all = document.createElement('div')
@@ -182,17 +207,6 @@ function setup() {
     type_dropdown.onclick = () => {
         favorite.innerText = '☆'
         applyFilters()
-        browser.storage.sync.set({
-            videos: videos,
-            shorts: shorts,
-            live_streams: live_streams,
-            unwatched: unwatched,
-            continue_watching: continue_watching,
-            finished: finished,
-            show_status: show_status.innerText,
-            type_status: type_status.innerText,
-            favorite_icon: favorite.innerText
-        })
     }
 
     let type_all = document.createElement('div')
@@ -319,17 +333,6 @@ function setup() {
             favorite.innerText = '★'
         }
         applyFilters()
-        browser.storage.sync.set({
-            videos: videos,
-            shorts: shorts,
-            live_streams: live_streams,
-            unwatched: unwatched,
-            continue_watching: continue_watching,
-            finished: finished,
-            show_status: show_status.innerText,
-            type_status: type_status.innerText,
-            favorite_icon: favorite.innerText
-        })
     }
 
     let status = document.createElement('div')
