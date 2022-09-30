@@ -9,7 +9,7 @@ const export_btn = document.getElementById('export')
 const import_btn = document.getElementById('import')
 const type = document.getElementById('type')
 const show = document.getElementById('show')
-const launch_fav = document.getElementById('launch_fav')
+const persist = document.getElementById('persist')
 
 white_btn.addEventListener('click', () => {
     let channel_input = document.getElementById('white_channel_input')
@@ -104,8 +104,8 @@ show.addEventListener('change', () => {
     browser.storage.sync.set({show: show.value})
 })
 
-launch_fav.addEventListener('change', () => {
-    browser.storage.sync.set({launch_fav: launch_fav.value})
+persist.addEventListener('change', () => {
+    browser.storage.sync.set({persist: persist.value})
 })
 
 browser.storage.sync.get().then((value) => {
@@ -132,11 +132,11 @@ browser.storage.sync.get().then((value) => {
         show.value = 'Unwatched'
         browser.storage.sync.set({show: show.value})
     }
-    if (value.launch_fav != undefined)
-        launch_fav.value = value.launch_fav
+    if (value.persist != undefined)
+        persist.value = value.persist
     else {
-        launch_fav.value = 'No'
-        browser.storage.sync.set({launch_fav: launch_fav.value})
+        persist.value = 'No'
+        browser.storage.sync.set({persist: persist.value})
     }
 }).then(() => {
     for (let i of white_list) 
