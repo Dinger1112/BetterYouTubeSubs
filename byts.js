@@ -55,7 +55,7 @@ function setup() {
             fav_type = value.type
         if (value.show != undefined)
             fav_show = value.show
-        if (value.persist == 'Yes') {
+        if (value.launch_fav == 'Yes') {
             favorite.innerText = '★'
             //for some reason these switches don't work if i put it into a function, look into it in the future
             switch (fav_type) {
