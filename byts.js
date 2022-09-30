@@ -1,6 +1,5 @@
 let subs_dom
 let is_setup = false
-let favorite_active = false
 
 let videos = true
 let shorts = true
@@ -56,6 +55,26 @@ function setup() {
             fav_type = value.type
         if (value.show != undefined)
             fav_show = value.show
+        if (value.persist == 'Yes') {
+            if (value.videos != undefined)
+                videos = value.videos
+            if (value.shorts != undefined)
+                shorts = value.shorts
+            if (value.live_streams != undefined)
+                live_streams = value.live_streams
+            if (value.unwatched != undefined)
+                unwatched = value.unwatched
+            if (value.continue_watching != undefined)
+                continue_watching = value.continue_watching
+            if (value.finished != undefined)
+                finished = value.finished
+            if (value.show_status != undefined)
+                show_status.innerText = value.show_status
+            if (value.type_status != undefined)
+                type_status.innerText = value.type_status
+            if (value.favorite_icon != undefined)
+                favorite.innerText = value.favorite_icon
+        }
         new MutationObserver((mutations) => {
             let nodes = mutations[0].addedNodes
             for (let node of nodes) {
@@ -89,9 +108,19 @@ function setup() {
     show_dropdown.classList.add('dropdown_content')
     show_dropdown.classList.add('hidden')
     show_dropdown.onclick = () => {
-        favorite_active = false
         favorite.innerText = '☆'
         applyFilters()
+        browser.storage.sync.set({
+            videos: videos,
+            shorts: shorts,
+            live_streams: live_streams,
+            unwatched: unwatched,
+            continue_watching: continue_watching,
+            finished: finished,
+            show_status: show_status.innerText,
+            type_status: type_status.innerText,
+            favorite_icon: favorite.innerText
+        })
     }
 
     let show_all = document.createElement('div')
@@ -151,9 +180,19 @@ function setup() {
     type_dropdown.classList.add('dropdown_content')
     type_dropdown.classList.add('hidden')
     type_dropdown.onclick = () => {
-        favorite_active = false
         favorite.innerText = '☆'
         applyFilters()
+        browser.storage.sync.set({
+            videos: videos,
+            shorts: shorts,
+            live_streams: live_streams,
+            unwatched: unwatched,
+            continue_watching: continue_watching,
+            finished: finished,
+            show_status: show_status.innerText,
+            type_status: type_status.innerText,
+            favorite_icon: favorite.innerText
+        })
     }
 
     let type_all = document.createElement('div')
@@ -204,8 +243,9 @@ function setup() {
     type.appendChild(type_dropdown)
 
     let favorite = document.createElement('button')
+    favorite.innerText = '☆'
     favorite.onclick = () => {
-        if (favorite_active) {
+        if (favorite.innerText == '★') {
             videos = videos_prev
             shorts = shorts_prev
             live_streams = live_streams_prev
@@ -215,8 +255,7 @@ function setup() {
             type_status.innerText = type_status_prev
             show_status.innerText = show_status_prev
             favorite.innerText = '☆'
-        }
-        else {
+        } else {
             videos_prev = videos
             shorts_prev = shorts
             live_streams_prev = live_streams
@@ -279,10 +318,19 @@ function setup() {
             }
             favorite.innerText = '★'
         }
-        favorite_active = !favorite_active
         applyFilters()
+        browser.storage.sync.set({
+            videos: videos,
+            shorts: shorts,
+            live_streams: live_streams,
+            unwatched: unwatched,
+            continue_watching: continue_watching,
+            finished: finished,
+            show_status: show_status.innerText,
+            type_status: type_status.innerText,
+            favorite_icon: favorite.innerText
+        })
     }
-    favorite.innerText = '☆'
 
     let status = document.createElement('div')
     status.classList.add('status')
@@ -328,7 +376,7 @@ function applyFilters() {
             if (grid_mode)
                 vid.style.display = 'inline-block'
             else {
-                let item_section_renderer = vid.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+                let item_section_renderer = vid.closest('ytd-item-section-renderer')
                 if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)){
                     vid.parentNode.parentNode.style.display = 'block'
                     item_section_renderer.querySelector('#image-container').style.display = 'flex'
@@ -342,7 +390,7 @@ function applyFilters() {
             if (grid_mode)
                 vid.style.display = 'none'
             else {
-                let item_section_renderer = vid.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+                let item_section_renderer = vid.closest('ytd-item-section-renderer')
                 if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
                     vid.parentNode.parentNode.style.display = 'none'
                     item_section_renderer.querySelector('#image-container').style.display = 'none'
@@ -388,7 +436,7 @@ function applyChannelFilters() {
             if (grid_mode)
                 vids[i].remove()
             else {
-                let item_section_renderer = vids[i].parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode
+                let item_section_renderer = vids[i].closest('ytd-item-section-renderer')
                 if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
                     vids[i].parentNode.parentNode.remove()
                     item_section_renderer.querySelector('#image-container').remove()

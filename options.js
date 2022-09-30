@@ -9,6 +9,7 @@ const export_btn = document.getElementById('export')
 const import_btn = document.getElementById('import')
 const type = document.getElementById('type')
 const show = document.getElementById('show')
+const persist = document.getElementById('persist')
 
 white_btn.addEventListener('click', () => {
     let channel_input = document.getElementById('white_channel_input')
@@ -103,6 +104,10 @@ show.addEventListener('change', () => {
     browser.storage.sync.set({show: show.value})
 })
 
+persist.addEventListener('change', () => {
+    browser.storage.sync.set({persist: persist.value})
+})
+
 browser.storage.sync.get().then((value) => {
     if (value.white_list != undefined){
         white_list = value.white_list
@@ -126,6 +131,12 @@ browser.storage.sync.get().then((value) => {
     else {
         show.value = 'Unwatched'
         browser.storage.sync.set({show: show.value})
+    }
+    if (value.persist != undefined)
+        persist.value = value.persist
+    else {
+        persist.value = 'No'
+        browser.storage.sync.set({persist: persist.value})
     }
 }).then(() => {
     for (let i of white_list) 
