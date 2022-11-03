@@ -39,7 +39,7 @@
     padding: 18px 16px 16px 3px;
 }
 
-button {
+.fav_btn {
     background-color: transparent;
     border: none;
     padding: 11px 16px 16px 16px;

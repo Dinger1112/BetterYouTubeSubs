@@ -257,6 +257,7 @@ function setup() {
     type.appendChild(type_dropdown)
 
     let favorite = document.createElement('button')
+    favorite.classList.add('fav_btn')
     favorite.innerText = '☆'
     favorite.onclick = () => {
         if (favorite.innerText == '★') {
