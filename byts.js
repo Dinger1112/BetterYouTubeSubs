@@ -23,23 +23,25 @@ let fav_type = "Videos"
 let fav_show = "Unwatched"
 
 window.addEventListener('yt-navigate-finish', () => {
-    if (window.location.pathname == '/feed/subscriptions') {
-        if(!is_setup) 
-            setup()
-        else {
-            setTimeout(() => {
-                applyFilters()
-                applyChannelFilters()
-            }, 1000)
-            setTimeout(() => {
-                applyFilters()
-                applyChannelFilters()
-            }, 3000)
+    setTimeout(() => {
+        if (window.location.pathname == '/feed/subscriptions') {
+            if(!is_setup) 
+                setup()
+            else {
+                setTimeout(() => {
+                    applyFilters()
+                    applyChannelFilters()
+                }, 1000)
+                setTimeout(() => {
+                    applyFilters()
+                    applyChannelFilters()
+                }, 3000)
+            }
+        } else {
+            for (let vid of document.getElementsByTagName('ytd-grid-video-renderer'))
+                vid.style.display = 'inline-block'
         }
-    } else {
-        for (let vid of document.getElementsByTagName('ytd-grid-video-renderer'))
-            vid.style.display = 'inline-block'
-    }
+    }, 500);
 })
 
 function setup() {
@@ -112,19 +114,14 @@ function setup() {
             }
         }
         new MutationObserver((mutations) => {
-            let nodes = mutations[0].addedNodes
-            for (let node of nodes) {
-                if (node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
-                        setTimeout(() => {
-                            applyFilters()
-                            applyChannelFilters()
-                        }, 1000)
-                        setTimeout(() => {
-                            applyFilters()
-                            applyChannelFilters()
-                        }, 3000)
-                }
-            }
+            setTimeout(() => {
+                applyFilters()
+                applyChannelFilters()
+            }, 1000)
+            setTimeout(() => {
+                applyFilters()
+                applyChannelFilters()
+            }, 3000)
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
     })
 
@@ -348,7 +345,7 @@ function setup() {
     status.appendChild(show_status)
     status.appendChild(type_status)
 
-    let title_container = subs_dom.querySelector('#title-container')
+    let title_container = subs_dom.querySelector('ytd-rich-section-renderer').querySelector('#title-container')
     title_container.insertBefore(show, title_container.childNodes[5])
     title_container.insertBefore(type, title_container.childNodes[5])
     title_container.insertBefore(favorite, title_container.childNodes[5])
@@ -367,14 +364,14 @@ function setup() {
 function applyFilters() {
     let grid_mode = subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
         'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z' 
-    let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-grid-video-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-rich-item-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
     for (let vid of vids) {
         let progress = vid.querySelector('#progress')
         try {progress = progress.style.width.slice(0, -1)}
         catch(err) {progress = 0}
         let is_live = (vid.querySelector('#metadata-line').textContent.search('Streamed') != -1 || 
                         vid.querySelector('#metadata-line').textContent.search('Scheduled') != -1 || 
-                        (grid_mode ? vid.querySelector('#video-badges').textContent.search('LIVE') != -1 : vid.querySelector('#badges').textContent.search('LIVE') != -1))
+                        (grid_mode ? vid.querySelector('.badge-style-type-live-now-alternate') != null : vid.querySelector('#badges').textContent.search('LIVE') != -1))
         let is_short = vid.querySelector('#overlays').firstChild.getAttribute('overlay-style') == 'SHORTS'
         if (((videos && !is_live && !is_short) || (shorts && is_short) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
             if (grid_mode)
