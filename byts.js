@@ -23,25 +23,26 @@ let fav_type = "Videos"
 let fav_show = "Unwatched"
 
 window.addEventListener('yt-navigate-finish', () => {
-    setTimeout(() => {
-        if (window.location.pathname == '/feed/subscriptions') {
-            if(!is_setup) 
-                setup()
-            else {
-                setTimeout(() => {
-                    applyFilters()
-                    applyChannelFilters()
-                }, 1000)
-                setTimeout(() => {
-                    applyFilters()
-                    applyChannelFilters()
-                }, 3000)
-            }
-        } else {
-            for (let vid of document.getElementsByTagName('ytd-grid-video-renderer'))
-                vid.style.display = 'inline-block'
+    console.log('finish')
+    if (window.location.pathname == '/feed/subscriptions') {
+        if(!is_setup) 
+        setTimeout(() => {
+            setup()
+        }, 1000);
+        else {
+            setTimeout(() => {
+                applyFilters()
+                applyChannelFilters()
+            }, 1000)
+            setTimeout(() => {
+                applyFilters()
+                applyChannelFilters()
+            }, 3000)
         }
-    }, 500);
+    } else {
+        for (let vid of document.getElementsByTagName('ytd-grid-video-renderer'))
+            vid.style.display = 'inline-block'
+    }
 })
 
 function setup() {
@@ -429,7 +430,7 @@ function passesBlackList(channel, title) {
 function applyChannelFilters() {
     let grid_mode = subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
         'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z'  
-    let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-grid-video-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-rich-item-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
     for (let i = 0; i < vids.length; i++) {
         let channel = vids[i].querySelector('#channel-name').querySelector('a').innerText.toLowerCase()
         let title = vids[i].querySelector('#video-title').innerText.toLowerCase()
