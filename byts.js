@@ -22,22 +22,20 @@ let black_list = []
 let fav_type = "Videos"
 let fav_show = "Unwatched"
 
+setTimeout(() => {
+    if (window.location.pathname == '/feed/subscriptions' && !is_setup)
+        setup()
+}, 2000);
+
 window.addEventListener('yt-navigate-finish', () => {
-    console.log('finish')
     if (window.location.pathname == '/feed/subscriptions') {
         if(!is_setup) 
-        setTimeout(() => {
             setup()
-        }, 1000);
         else {
             setTimeout(() => {
-                applyFilters()
                 applyChannelFilters()
+                applyFilters()
             }, 1000)
-            setTimeout(() => {
-                applyFilters()
-                applyChannelFilters()
-            }, 3000)
         }
     } else {
         for (let vid of document.getElementsByTagName('ytd-grid-video-renderer'))
@@ -53,6 +51,7 @@ function setup() {
             white_list = value.white_list
             black_list = value.black_list
             applyChannelFilters()
+            moveVideos()
         }
         if (value.type != undefined) 
             fav_type = value.type
@@ -116,13 +115,9 @@ function setup() {
         }
         new MutationObserver((mutations) => {
             setTimeout(() => {
-                applyFilters()
                 applyChannelFilters()
+                applyFilters()
             }, 1000)
-            setTimeout(() => {
-                applyFilters()
-                applyChannelFilters()
-            }, 3000)
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
     })
 
@@ -401,11 +396,43 @@ function applyFilters() {
             }
         }
     }
-    let cont_item_rend = subs_dom.querySelector('ytd-continuation-item-renderer')
-    cont_item_rend.style.height = '1000px'
-    window.scrollBy(0, 1)
-    window.scrollBy(0,-1)
-    cont_item_rend.style.height = 'initial'
+    moveVideos()
+}
+
+function moveVideos() {
+    let grid_rows = subs_dom.getElementsByTagName('ytd-rich-grid-row')
+    for (let index = 0; index < grid_rows.length; index++) {
+        row = grid_rows[index]
+        let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
+        let row_contents = row.querySelector('#contents')
+        let row_vids = []
+        for (v of row.getElementsByTagName('ytd-rich-item-renderer')) {
+            if (v.style.display != 'none') {
+                row_vids.push(v)
+            }
+        }
+        let row_length = row_vids.length
+        if (row_length < items_per_row) {
+            for (let i = index+1; i < grid_rows.length; i++) {
+                next_row_vids = grid_rows[i].getElementsByTagName('ytd-rich-item-renderer')
+                for (let j = 0; j < next_row_vids.length; j++) {
+                    if (next_row_vids[j].style.display != 'none') {
+                        row_contents.appendChild(next_row_vids[j])
+                        row_length++
+                        j--
+                    }
+                    if (row_length == items_per_row)
+                        break
+                }
+                if (row_length == items_per_row)
+                    break
+            }
+        } else if (row_length > items_per_row) {
+            for (let v of row_vids.slice(items_per_row).reverse()) {
+                grid_rows[index+1].querySelector('#contents').prepend(v)
+            }
+        }
+    }
 }
 
 function passesWhiteList(channel, title) {
