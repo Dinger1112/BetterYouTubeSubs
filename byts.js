@@ -117,7 +117,11 @@ function setup() {
             setTimeout(() => {
                 applyChannelFilters()
                 applyFilters()
-            }, 1000)
+            }, 1500)
+            setTimeout(() => {
+                applyChannelFilters()
+                applyFilters()
+            }, 3000)
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
     })
 
@@ -409,7 +413,7 @@ function moveVideos() {
         let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
         let row_contents = row.querySelector('#contents')
         let row_vids = []
-        for (v of row.getElementsByTagName('ytd-rich-item-renderer')) {
+        for (let v of row.getElementsByTagName('ytd-rich-item-renderer')) {
             if (v.style.display != 'none') {
                 row_vids.push(v)
             }
