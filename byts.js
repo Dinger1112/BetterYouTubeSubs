@@ -358,42 +358,45 @@ function setup() {
 }
 
 function applyFilters() {
-    let grid_mode = subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
-        'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z' 
-    let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-rich-item-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    // let grid_mode = subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
+    //     'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z' 
+    // let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-rich-item-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
     for (let vid of vids) {
         let progress = vid.querySelector('#progress')
         try {progress = progress.style.width.slice(0, -1)}
         catch(err) {progress = 0}
         let is_live = (vid.querySelector('#metadata-line').textContent.search('Streamed') != -1 || 
                         vid.querySelector('#metadata-line').textContent.search('Scheduled') != -1 || 
-                        (grid_mode ? vid.querySelector('.badge-style-type-live-now-alternate') != null : vid.querySelector('#badges').textContent.search('LIVE') != -1))
+                        //(grid_mode ? vid.querySelector('.badge-style-type-live-now-alternate') != null : vid.querySelector('#badges').textContent.search('LIVE') != -1)
+                        vid.querySelector('.badge-style-type-live-now-alternate') != null
+                    )
         let is_short = vid.querySelector('#overlays').firstChild.getAttribute('overlay-style') == 'SHORTS'
         if (((videos && !is_live && !is_short) || (shorts && is_short) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
-            if (grid_mode)
+            // if (grid_mode)
                 vid.style.display = 'inline-block'
-            else {
-                let item_section_renderer = vid.closest('ytd-item-section-renderer')
-                if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)){
-                    vid.parentNode.parentNode.style.display = 'block'
-                    item_section_renderer.querySelector('#image-container').style.display = 'flex'
-                } else {
-                    vid.parentNode.parentNode.style.display = 'block'
-                    item_section_renderer.style.display = 'block'
-                }
-            }
+            // else {
+            //     let item_section_renderer = vid.closest('ytd-item-section-renderer')
+            //     if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)){
+            //         vid.parentNode.parentNode.style.display = 'block'
+            //         item_section_renderer.querySelector('#image-container').style.display = 'flex'
+            //     } else {
+            //         vid.parentNode.parentNode.style.display = 'block'
+            //         item_section_renderer.style.display = 'block'
+            //     }
+            // }
         }
         else {
-            if (grid_mode)
+            // if (grid_mode)
                 vid.style.display = 'none'
-            else {
-                let item_section_renderer = vid.closest('ytd-item-section-renderer')
-                if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
-                    vid.parentNode.parentNode.style.display = 'none'
-                    item_section_renderer.querySelector('#image-container').style.display = 'none'
-                } else
-                    item_section_renderer.style.display = 'none'
-            }
+            // else {
+            //     let item_section_renderer = vid.closest('ytd-item-section-renderer')
+            //     if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
+            //         vid.parentNode.parentNode.style.display = 'none'
+            //         item_section_renderer.querySelector('#image-container').style.display = 'none'
+            //     } else
+            //         item_section_renderer.style.display = 'none'
+            // }
         }
     }
     moveVideos()
@@ -455,23 +458,24 @@ function passesBlackList(channel, title) {
 }
 
 function applyChannelFilters() {
-    let grid_mode = subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
-        'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z'  
-    let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-rich-item-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    // let grid_mode = subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
+    //     'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z'  
+    //let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-rich-item-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
     for (let i = 0; i < vids.length; i++) {
         let channel = vids[i].querySelector('#channel-name').querySelector('a').innerText.toLowerCase()
         let title = vids[i].querySelector('#video-title').innerText.toLowerCase()
         if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
-            if (grid_mode)
+            // if (grid_mode)
                 vids[i].remove()
-            else {
-                let item_section_renderer = vids[i].closest('ytd-item-section-renderer')
-                if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
-                    vids[i].parentNode.parentNode.remove()
-                    item_section_renderer.querySelector('#image-container').remove()
-                } else
-                    item_section_renderer.querySelector('#contents').remove()
-            }
+            // else {
+            //     let item_section_renderer = vids[i].closest('ytd-item-section-renderer')
+            //     if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
+            //         vids[i].parentNode.parentNode.remove()
+            //         item_section_renderer.querySelector('#image-container').remove()
+            //     } else
+            //         item_section_renderer.querySelector('#contents').remove()
+            // }
             i--
         }
     }
