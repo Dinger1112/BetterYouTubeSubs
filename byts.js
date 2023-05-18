@@ -35,7 +35,11 @@ window.addEventListener('yt-navigate-finish', () => {
             setTimeout(() => {
                 applyChannelFilters()
                 applyFilters()
-            }, 1000)
+            }, 1500)
+            setTimeout(() => {
+                applyChannelFilters()
+                applyFilters()
+            }, 3000)
         }
     } else {
         for (let vid of document.getElementsByTagName('ytd-grid-video-renderer'))
