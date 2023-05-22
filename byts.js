@@ -27,7 +27,17 @@ setTimeout(() => {
         setup()
 }, 2000);
 
+window.addEventListener('yt-navigate', () => {
+    browser.runtime.sendMessage({ type: 'page', message: window.location.pathname })
+    browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
+})
+browser.runtime.sendMessage({ type: 'page', message: window.location.pathname })
+browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
+document.querySelector('#video-preview').remove()
+
 window.addEventListener('yt-navigate-finish', () => {
+    browser.runtime.sendMessage({ type: 'page', message: window.location.pathname })
+    browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
     if (window.location.pathname == '/feed/subscriptions') {
         if(!is_setup) 
             setup()
@@ -42,7 +52,7 @@ window.addEventListener('yt-navigate-finish', () => {
             }, 3000)
         }
     } else {
-        for (let vid of document.getElementsByTagName('ytd-grid-video-renderer'))
+        for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
             vid.style.display = 'inline-block'
     }
 })
@@ -125,8 +135,40 @@ function setup() {
             setTimeout(() => {
                 applyChannelFilters()
                 applyFilters()
-            }, 3000)
+            }, 3000)  
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
+    })
+
+    setTimeout(() => {
+        let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+        continue_element.insertAdjacentElement('beforebegin', show_more)
+    }, 2000);
+
+    let show_more = document.createElement('div')
+    show_more.classList.add('btn', 'show_more')
+    show_more.innerText = 'SHOW MORE'
+    show_more.onclick = () => {
+        show_more.style.height = '1000px'
+        browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
+        window.scrollBy(0, -1)
+        setTimeout(() => {
+            window.scrollBy(0, 1)
+            show_more.style.height = 'initial'
+        }, 0)
+        setTimeout(() => {
+            browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
+        }, 500)
+        setTimeout(() => {
+            continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+            continue_element.insertAdjacentElement('beforebegin', show_more)
+        }, 4000)
+    }
+
+    window.addEventListener('yt-navigate-finish', () => {
+        setTimeout(() => {
+            continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+            continue_element.insertAdjacentElement('beforebegin', show_more)
+        }, 2000);
     })
 
     let show = document.createElement('div')
@@ -366,6 +408,7 @@ function setup() {
 }
 
 function applyFilters() {
+    //browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
     // let grid_mode = subs_dom.querySelector('[aria-label="Switch to grid view"]').querySelector('path').getAttribute('d') == 
     //     'M2,4h6v7H2V4z M2,20h6v-7H2V20z M9,11h6V4H9V11z M9,20h6v-7H9V20z M16,4v7h6V4H16z M16,20h6v-7h-6V20z' 
     // let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-rich-item-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
@@ -379,7 +422,9 @@ function applyFilters() {
                         //(grid_mode ? vid.querySelector('.badge-style-type-live-now-alternate') != null : vid.querySelector('#badges').textContent.search('LIVE') != -1)
                         vid.querySelector('.badge-style-type-live-now-alternate') != null
                     )
-        let is_short = vid.querySelector('#overlays').firstChild.getAttribute('overlay-style') == 'SHORTS'
+        let is_short
+        try {is_short = vid.querySelector('#overlays').firstChild.getAttribute('overlay-style') == 'SHORTS'}
+        catch {is_short = false}
         if (((videos && !is_live && !is_short) || (shorts && is_short) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
             // if (grid_mode)
                 vid.style.display = 'inline-block'
