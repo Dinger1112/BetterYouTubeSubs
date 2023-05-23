@@ -45,11 +45,7 @@ window.addEventListener('yt-navigate-finish', () => {
             setTimeout(() => {
                 applyChannelFilters()
                 applyFilters()
-            }, 1500)
-            setTimeout(() => {
-                applyChannelFilters()
-                applyFilters()
-            }, 3000)
+            }, 2000)
         }
     } else {
         for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
@@ -130,12 +126,8 @@ function setup() {
         new MutationObserver((mutations) => {
             setTimeout(() => {
                 applyChannelFilters()
-                applyFilters()
-            }, 1500)
-            setTimeout(() => {
-                applyChannelFilters()
-                applyFilters()
-            }, 3000)  
+                applyFilters() 
+            }, 2000) 
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
     })
 
@@ -422,9 +414,7 @@ function applyFilters() {
                         //(grid_mode ? vid.querySelector('.badge-style-type-live-now-alternate') != null : vid.querySelector('#badges').textContent.search('LIVE') != -1)
                         vid.querySelector('.badge-style-type-live-now-alternate') != null
                     )
-        let is_short
-        try {is_short = vid.querySelector('#overlays').firstChild.getAttribute('overlay-style') == 'SHORTS'}
-        catch {is_short = false}
+        let is_short = vid.querySelector('#overlays').textContent.search('SHORTS') != -1
         if (((videos && !is_live && !is_short) || (shorts && is_short) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
             // if (grid_mode)
                 vid.style.display = 'inline-block'
