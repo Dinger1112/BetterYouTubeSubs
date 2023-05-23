@@ -412,7 +412,7 @@ function applyFilters() {
         let is_live = (vid.querySelector('#metadata-line').textContent.search('Streamed') != -1 || 
                         vid.querySelector('#metadata-line').textContent.search('Scheduled') != -1 || 
                         //(grid_mode ? vid.querySelector('.badge-style-type-live-now-alternate') != null : vid.querySelector('#badges').textContent.search('LIVE') != -1)
-                        vid.querySelector('.badge-style-type-live-now-alternate') != null
+                        (vid.querySelector('.badge-style-type-live-now-alternate') != null && vid.querySelector('.badge-style-type-live-now-alternate').textContent == 'LIVE')
                     )
         let is_short = vid.querySelector('#overlays').textContent.search('SHORTS') != -1
         if (((videos && !is_live && !is_short) || (shorts && is_short) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
