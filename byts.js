@@ -448,34 +448,31 @@ function applyFilters() {
 function moveVideos() {
     let grid_rows = subs_dom.getElementsByTagName('ytd-rich-grid-row')
     for (let index = 0; index < grid_rows.length; index++) {
-        row = grid_rows[index]
+        let row = grid_rows[index]
         let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
         let row_contents = row.querySelector('#contents')
-        let row_vids = []
+        let row_length = 0
         for (let v of row.getElementsByTagName('ytd-rich-item-renderer')) {
-            if (v.style.display != 'none') {
-                row_vids.push(v)
-            }
+            if (v.style.display != 'none')
+                row_length++
         }
-        let row_length = row_vids.length
         if (row_length < items_per_row) {
             for (let i = index+1; i < grid_rows.length; i++) {
-                next_row_vids = grid_rows[i].getElementsByTagName('ytd-rich-item-renderer')
-                for (let j = 0; j < next_row_vids.length; j++) {
-                    if (next_row_vids[j].style.display != 'none') {
-                        row_contents.appendChild(next_row_vids[j])
+                let next_row_contents = grid_rows[i].querySelector('#contents')
+                while (row_length != items_per_row && next_row_contents.children.length != 0) {
+                    let first_child = next_row_contents.firstElementChild
+                    row_contents.appendChild(first_child)
+                    if (first_child.style.display != 'none')
                         row_length++
-                        j--
-                    }
-                    if (row_length == items_per_row)
-                        break
                 }
-                if (row_length == items_per_row)
-                    break
             }
         } else if (row_length > items_per_row) {
-            for (let v of row_vids.slice(items_per_row).reverse()) {
-                grid_rows[index+1].querySelector('#contents').prepend(v)
+            let next_row_contents = grid_rows[index+1].querySelector('#contents')
+            while (row_length != items_per_row) {
+                let last_child = row_contents.lastElementChild
+                next_row_contents.prepend(last_child)
+                if (last_child.style.display != 'none')
+                    row_length--
             }
         }
     }
