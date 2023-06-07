@@ -371,9 +371,9 @@ function applyFilters() {
         let progress = vid.querySelector('#progress')
         try {progress = progress.style.width.slice(0, -1)}
         catch(err) {progress = 0}
-        let is_live = (vid.querySelector('#metadata-line').textContent.search('Streamed') != -1 || 
-                        vid.querySelector('#metadata-line').textContent.search('Scheduled') != -1 || 
-                        (grid_mode ? vid.querySelector('#video-badges').textContent.search('LIVE') != -1 : vid.querySelector('#badges').textContent.search('LIVE') != -1))
+        let is_live = (vid.querySelector('#metadata-line').textContent.includes('Streamed') || 
+                        vid.querySelector('#metadata-line').textContent.includes('Scheduled') || 
+                        (grid_mode ? vid.querySelector('#video-badges').textContent.includes('LIVE') : vid.querySelector('#badges').textContent.includes('LIVE')))
         let is_short = vid.querySelector('#overlays').firstChild.getAttribute('overlay-style') == 'SHORTS'
         if (((videos && !is_live && !is_short) || (shorts && is_short) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
             if (grid_mode)
@@ -414,7 +414,7 @@ function passesWhiteList(channel, title) {
     for (let obj of white_list) {
         if (channel == obj.channel.toLowerCase()) {
             isChannelInWhiteList = true
-            if (title.search('\\b' + obj.title.toLowerCase() + '\\b') != -1) 
+            if (title.includes(obj.title.toLowerCase())) 
                 return true
         }
     }
@@ -423,7 +423,7 @@ function passesWhiteList(channel, title) {
 
 function passesBlackList(channel, title) {
     for (let obj of black_list)
-        if (channel == obj.channel.toLowerCase() && title.search('\\b' + obj.title.toLowerCase() + '\\b') != -1) 
+        if (channel == obj.channel.toLowerCase() && title.includes(obj.title.toLowerCase())) 
             return false
     return true
 }
