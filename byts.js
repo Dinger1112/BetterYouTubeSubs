@@ -22,22 +22,33 @@ let black_list = []
 let fav_type = "Videos"
 let fav_show = "Unwatched"
 
+setTimeout(() => {
+    if (window.location.pathname == '/feed/subscriptions' && !is_setup)
+        setup()
+}, 2000);
+
+window.addEventListener('yt-navigate', () => {
+    browser.runtime.sendMessage({ type: 'page', message: window.location.pathname })
+    browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
+})
+browser.runtime.sendMessage({ type: 'page', message: window.location.pathname })
+browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
+document.querySelector('#video-preview').remove()
+
 window.addEventListener('yt-navigate-finish', () => {
+    browser.runtime.sendMessage({ type: 'page', message: window.location.pathname })
+    browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
     if (window.location.pathname == '/feed/subscriptions') {
         if(!is_setup) 
             setup()
         else {
             setTimeout(() => {
-                applyFilters()
                 applyChannelFilters()
-            }, 1000)
-            setTimeout(() => {
                 applyFilters()
-                applyChannelFilters()
-            }, 3000)
+            }, 2000)
         }
     } else {
-        for (let vid of document.getElementsByTagName('ytd-grid-video-renderer'))
+        for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
             vid.style.display = 'inline-block'
     }
 })
@@ -50,6 +61,7 @@ function setup() {
             white_list = value.white_list
             black_list = value.black_list
             applyChannelFilters()
+            moveVideos()
         }
         if (value.type != undefined) 
             fav_type = value.type
@@ -112,20 +124,51 @@ function setup() {
             }
         }
         new MutationObserver((mutations) => {
-            let nodes = mutations[0].addedNodes
-            for (let node of nodes) {
-                if (node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
-                        setTimeout(() => {
-                            applyFilters()
-                            applyChannelFilters()
-                        }, 1000)
-                        setTimeout(() => {
-                            applyFilters()
-                            applyChannelFilters()
-                        }, 3000)
-                }
-            }
+            setTimeout(() => {
+                applyChannelFilters()
+                applyFilters() 
+            }, 2000) 
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
+    })
+
+    setTimeout(() => {
+        let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+        continue_element.insertAdjacentElement('beforebegin', show_more)
+        subs_dom.querySelector('#ghost-cards').style.display = 'none'
+        subs_dom.querySelector('#spinner').style.display = 'none'
+    }, 2000);
+
+    let show_more = document.createElement('div')
+    show_more.classList.add('btn', 'show_more')
+    show_more.innerText = 'SHOW MORE'
+    show_more.onclick = () => {
+        subs_dom.querySelector('#ghost-cards').style.display = 'initial'
+        subs_dom.querySelector('#spinner').style.display = 'initial'
+        show_more.style.height = '1000px'
+        browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
+        window.scrollBy(0, -1)
+        setTimeout(() => {
+            window.scrollBy(0, 1)
+            show_more.style.height = 'initial'
+        }, 0)
+        setTimeout(() => {
+            browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
+        }, 500)
+        setTimeout(() => {
+            continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+            continue_element.insertAdjacentElement('beforebegin', show_more)
+            subs_dom.querySelector('#ghost-cards').style.display = 'none'
+            subs_dom.querySelector('#spinner').style.display = 'none'
+        }, 4000)
+    }
+
+    window.addEventListener('yt-navigate-finish', () => {
+        setTimeout(() => {
+            continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+            continue_element.insertAdjacentElement('beforebegin', show_more)
+            subs_dom.querySelector('#ghost-cards').style.display = 'none'
+            subs_dom.querySelector('#spinner').style.display = 'none'
+        }, 2000);
     })
 
     let show = document.createElement('div')
@@ -348,7 +391,7 @@ function setup() {
     status.appendChild(show_status)
     status.appendChild(type_status)
 
-    let title_container = subs_dom.querySelector('#title-container')
+    let title_container = subs_dom.querySelector('ytd-rich-section-renderer').querySelector('#title-container')
     title_container.insertBefore(show, title_container.childNodes[5])
     title_container.insertBefore(type, title_container.childNodes[5])
     title_container.insertBefore(favorite, title_container.childNodes[5])
@@ -365,48 +408,80 @@ function setup() {
 }
 
 function applyFilters() {
-    let grid_mode = subs_dom.querySelector('ytd-grid-video-renderer') != null
-    let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-grid-video-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    // let grid_mode = subs_dom.querySelector('ytd-grid-video-renderer') != null 
+    // let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-rich-item-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
     for (let vid of vids) {
         let progress = vid.querySelector('#progress')
         try {progress = progress.style.width.slice(0, -1)}
         catch(err) {progress = 0}
         let is_live = (vid.querySelector('#metadata-line').textContent.includes('Streamed') || 
                         vid.querySelector('#metadata-line').textContent.includes('Scheduled') || 
-                        (grid_mode ? vid.querySelector('#video-badges').textContent.includes('LIVE') : vid.querySelector('#badges').textContent.includes('LIVE')))
-        let is_short = vid.querySelector('#overlays').firstChild.getAttribute('overlay-style') == 'SHORTS'
+                        //(grid_mode ? vid.querySelector('.badge-style-type-live-now-alternate') != null : vid.querySelector('#badges').textContent.includes('LIVE'))
+                        (vid.querySelector('.badge-style-type-live-now-alternate') != null && vid.querySelector('.badge-style-type-live-now-alternate').textContent == 'LIVE')
+                    )
+        let is_short = vid.querySelector('#overlays').textContent.includes('SHORTS')
         if (((videos && !is_live && !is_short) || (shorts && is_short) || (live_streams && is_live)) && ((unwatched && progress < 15) || (continue_watching && progress >= 15 && progress <= 80) || (finished && progress > 80))) {
-            if (grid_mode)
+            // if (grid_mode)
                 vid.style.display = 'inline-block'
-            else {
-                let item_section_renderer = vid.closest('ytd-item-section-renderer')
-                if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)){
-                    vid.parentNode.parentNode.style.display = 'block'
-                    item_section_renderer.querySelector('#image-container').style.display = 'flex'
-                } else {
-                    vid.parentNode.parentNode.style.display = 'block'
-                    item_section_renderer.style.display = 'block'
-                }
-            }
+            // else {
+            //     let item_section_renderer = vid.closest('ytd-item-section-renderer')
+            //     if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)){
+            //         vid.parentNode.parentNode.style.display = 'block'
+            //         item_section_renderer.querySelector('#image-container').style.display = 'flex'
+            //     } else {
+            //         vid.parentNode.parentNode.style.display = 'block'
+            //         item_section_renderer.style.display = 'block'
+            //     }
+            // }
         }
         else {
-            if (grid_mode)
+            // if (grid_mode)
                 vid.style.display = 'none'
-            else {
-                let item_section_renderer = vid.closest('ytd-item-section-renderer')
-                if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
-                    vid.parentNode.parentNode.style.display = 'none'
-                    item_section_renderer.querySelector('#image-container').style.display = 'none'
-                } else
-                    item_section_renderer.style.display = 'none'
+            // else {
+            //     let item_section_renderer = vid.closest('ytd-item-section-renderer')
+            //     if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
+            //         vid.parentNode.parentNode.style.display = 'none'
+            //         item_section_renderer.querySelector('#image-container').style.display = 'none'
+            //     } else
+            //         item_section_renderer.style.display = 'none'
+            // }
+        }
+    }
+    moveVideos()
+}
+
+function moveVideos() {
+    let grid_rows = subs_dom.getElementsByTagName('ytd-rich-grid-row')
+    for (let index = 0; index < grid_rows.length; index++) {
+        let row = grid_rows[index]
+        let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
+        let row_contents = row.querySelector('#contents')
+        let row_length = 0
+        for (let v of row.getElementsByTagName('ytd-rich-item-renderer')) {
+            if (v.style.display != 'none')
+                row_length++
+        }
+        if (row_length < items_per_row) {
+            for (let i = index+1; i < grid_rows.length; i++) {
+                let next_row_contents = grid_rows[i].querySelector('#contents')
+                while (row_length != items_per_row && next_row_contents.children.length != 0) {
+                    let first_child = next_row_contents.firstElementChild
+                    row_contents.appendChild(first_child)
+                    if (first_child.style.display != 'none')
+                        row_length++
+                }
+            }
+        } else if (row_length > items_per_row) {
+            let next_row_contents = grid_rows[index+1].querySelector('#contents')
+            while (row_length != items_per_row) {
+                let last_child = row_contents.lastElementChild
+                next_row_contents.prepend(last_child)
+                if (last_child.style.display != 'none')
+                    row_length--
             }
         }
     }
-    let cont_item_rend = subs_dom.querySelector('ytd-continuation-item-renderer')
-    cont_item_rend.style.height = '1000px'
-    window.scrollBy(0, 1)
-    window.scrollBy(0,-1)
-    cont_item_rend.style.height = 'initial'
 }
 
 function passesWhiteList(channel, title) {
@@ -429,22 +504,23 @@ function passesBlackList(channel, title) {
 }
 
 function applyChannelFilters() {
-    let grid_mode = subs_dom.querySelector('ytd-grid-video-renderer') != null 
-    let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-grid-video-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    // let grid_mode = subs_dom.querySelector('ytd-grid-video-renderer') != null 
+    //let vids = grid_mode ? subs_dom.getElementsByTagName('ytd-rich-item-renderer') : subs_dom.getElementsByTagName('ytd-video-renderer')
+    let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
     for (let i = 0; i < vids.length; i++) {
         let channel = vids[i].querySelector('#channel-name').querySelector('a').innerText.toLowerCase()
         let title = vids[i].querySelector('#video-title').innerText.toLowerCase()
         if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
-            if (grid_mode)
+            // if (grid_mode)
                 vids[i].remove()
-            else {
-                let item_section_renderer = vids[i].closest('ytd-item-section-renderer')
-                if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
-                    vids[i].parentNode.parentNode.remove()
-                    item_section_renderer.querySelector('#image-container').remove()
-                } else
-                    item_section_renderer.querySelector('#contents').remove()
-            }
+            // else {
+            //     let item_section_renderer = vids[i].closest('ytd-item-section-renderer')
+            //     if (item_section_renderer.isSameNode(item_section_renderer.parentNode.firstChild)) {
+            //         vids[i].parentNode.parentNode.remove()
+            //         item_section_renderer.querySelector('#image-container').remove()
+            //     } else
+            //         item_section_renderer.querySelector('#contents').remove()
+            // }
             i--
         }
     }

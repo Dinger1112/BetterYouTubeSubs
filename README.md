@@ -25,3 +25,6 @@ On the subscriptions page, in the upper right next to manage, will be two drop d
 
 ### Channel Filters
 You can add and remove entries to the white/black list in the extension's options from the extensions page. Type the channel name and the keywords into the input boxes to add a new entry. Hover over any of the listed entries and click the X next to it to remove it. You can also import and export your filters using the buttons at the top on the options page. The import must be a json and will add all entries from the import into your current list while ignoring any duplicates.
+
+### Other Details
+At the bottom of the page there is a button called "Show More" and that will cause more videos to load in since I disabled the automatic loading of videos when you scroll. The reason for this is because if there's a filter applied that hides most or all the videos being loaded in, the page will be stuck in a loop of always loading in more videos. The video preview you get when hovering over a video has also been disabled since it didn't play nice when filtering videos.
