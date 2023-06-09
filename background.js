@@ -10,7 +10,7 @@ browser.runtime.onMessage.addListener((obj) => {
 
 browser.webRequest.onBeforeRequest.addListener(
     (details) => {
-        if (current_page == '/feed/subscriptions' && stop_loading_vids && details.url.includes('browse'))
+        if (current_page == '/feed/subscriptions' && stop_loading_vids && details.url.includes('browse') && !details.url.includes('edit_playlist'))
             return { cancel: true };
     },
     { urls: ['<all_urls>'] },

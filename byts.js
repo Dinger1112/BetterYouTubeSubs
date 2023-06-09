@@ -48,8 +48,10 @@ window.addEventListener('yt-navigate-finish', () => {
             }, 2000)
         }
     } else {
-        for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
-            vid.style.display = 'inline-block'
+        setTimeout(() => {
+            for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
+                vid.style.display = 'inline-block'
+        }, 2000);
     }
 })
 
