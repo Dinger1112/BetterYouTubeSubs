@@ -136,16 +136,16 @@ function setup() {
     setTimeout(() => {
         let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
         continue_element.insertAdjacentElement('beforebegin', show_more)
-        subs_dom.querySelector('#ghost-cards').style.display = 'none'
-        subs_dom.querySelector('#spinner').style.display = 'none'
+        // subs_dom.querySelector('#ghost-cards').style.display = 'none'
+        // subs_dom.querySelector('#spinner').style.display = 'none'
     }, 2000);
 
     let show_more = document.createElement('div')
     show_more.classList.add('btn', 'show_more')
     show_more.innerText = 'SHOW MORE'
     show_more.onclick = () => {
-        subs_dom.querySelector('#ghost-cards').style.display = 'initial'
-        subs_dom.querySelector('#spinner').style.display = 'initial'
+        // subs_dom.querySelector('#ghost-cards').style.display = 'initial'
+        // subs_dom.querySelector('#spinner').style.display = 'initial'
         show_more.style.height = '1000px'
         browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
         window.scrollBy(0, -1)
@@ -159,8 +159,8 @@ function setup() {
         setTimeout(() => {
             continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
             continue_element.insertAdjacentElement('beforebegin', show_more)
-            subs_dom.querySelector('#ghost-cards').style.display = 'none'
-            subs_dom.querySelector('#spinner').style.display = 'none'
+            // subs_dom.querySelector('#ghost-cards').style.display = 'none'
+            // subs_dom.querySelector('#spinner').style.display = 'none'
         }, 4000)
     }
 
@@ -168,8 +168,8 @@ function setup() {
         setTimeout(() => {
             continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
             continue_element.insertAdjacentElement('beforebegin', show_more)
-            subs_dom.querySelector('#ghost-cards').style.display = 'none'
-            subs_dom.querySelector('#spinner').style.display = 'none'
+            // subs_dom.querySelector('#ghost-cards').style.display = 'none'
+            // subs_dom.querySelector('#spinner').style.display = 'none'
         }, 2000);
     })
 
