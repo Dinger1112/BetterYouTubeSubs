@@ -22,6 +22,8 @@ let black_list = []
 let fav_type = "Videos"
 let fav_show = "Unwatched"
 
+let WAIT_TIME = 2500
+
 setTimeout(() => {
     if (window.location.pathname == '/feed/subscriptions' && !is_setup)
         setup()
@@ -45,7 +47,7 @@ window.addEventListener('yt-navigate-finish', () => {
             setTimeout(() => {
                 applyChannelFilters()
                 applyFilters()
-            }, 2000)
+            }, WAIT_TIME);
         }
     } else {
         setTimeout(() => {
@@ -125,52 +127,49 @@ function setup() {
                     break
             }
         }
-        new MutationObserver((mutations) => {
-            setTimeout(() => {
-                applyChannelFilters()
-                applyFilters() 
-            }, 2000) 
-        }).observe(subs_dom.querySelector('#contents'), {childList: true})
     })
 
     setTimeout(() => {
         let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
         continue_element.insertAdjacentElement('beforebegin', show_more)
-        // subs_dom.querySelector('#ghost-cards').style.display = 'none'
-        // subs_dom.querySelector('#spinner').style.display = 'none'
+        subs_dom.querySelector('#ghost-cards').style.display = 'none'
+        subs_dom.querySelector('#spinner').style.display = 'none'
     }, 2000);
 
     let show_more = document.createElement('div')
     show_more.classList.add('btn', 'show_more')
     show_more.innerText = 'SHOW MORE'
     show_more.onclick = () => {
-        // subs_dom.querySelector('#ghost-cards').style.display = 'initial'
-        // subs_dom.querySelector('#spinner').style.display = 'initial'
+        subs_dom.querySelector('#ghost-cards').style.display = 'initial'
+        subs_dom.querySelector('#spinner').style.display = 'initial'
         show_more.style.height = '1000px'
         browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
         window.scrollBy(0, -1)
         setTimeout(() => {
             window.scrollBy(0, 1)
             show_more.style.height = 'initial'
-        }, 0)
+        }, 20)
         setTimeout(() => {
             browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
         }, 500)
         setTimeout(() => {
             continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
             continue_element.insertAdjacentElement('beforebegin', show_more)
-            // subs_dom.querySelector('#ghost-cards').style.display = 'none'
-            // subs_dom.querySelector('#spinner').style.display = 'none'
-        }, 4000)
+            applyChannelFilters()
+            applyFilters() 
+            subs_dom.querySelector('#ghost-cards').style.display = 'none'
+            subs_dom.querySelector('#spinner').style.display = 'none'
+            WAIT_TIME += 1000
+        }, WAIT_TIME + 1500)
     }
 
     window.addEventListener('yt-navigate-finish', () => {
         setTimeout(() => {
             continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
             continue_element.insertAdjacentElement('beforebegin', show_more)
-            // subs_dom.querySelector('#ghost-cards').style.display = 'none'
-            // subs_dom.querySelector('#spinner').style.display = 'none'
-        }, 2000);
+            subs_dom.querySelector('#ghost-cards').style.display = 'none'
+            subs_dom.querySelector('#spinner').style.display = 'none'
+        }, WAIT_TIME + 500);
     })
 
     let show = document.createElement('div')
