@@ -22,7 +22,7 @@ let black_list = []
 let fav_type = "Videos"
 let fav_show = "Unwatched"
 
-let WAIT_TIME = 2500
+let WAIT_TIME = 2200
 
 setTimeout(() => {
     if (window.location.pathname == '/feed/subscriptions' && !is_setup)
@@ -142,7 +142,7 @@ function setup() {
     show_more.onclick = () => {
         subs_dom.querySelector('#ghost-cards').style.display = 'initial'
         subs_dom.querySelector('#spinner').style.display = 'initial'
-        show_more.style.height = '1000px'
+        show_more.style.height = '2000px'
         browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
         window.scrollBy(0, -1)
         setTimeout(() => {
@@ -160,7 +160,7 @@ function setup() {
             subs_dom.querySelector('#ghost-cards').style.display = 'none'
             subs_dom.querySelector('#spinner').style.display = 'none'
             WAIT_TIME += 1000
-        }, WAIT_TIME + 1500)
+        }, WAIT_TIME + 1000)
     }
 
     window.addEventListener('yt-navigate-finish', () => {
