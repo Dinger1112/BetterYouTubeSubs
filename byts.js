@@ -45,13 +45,13 @@ window.addEventListener('yt-navigate-finish', () => {
             setup()
         else {
             setTimeout(() => {
-                if (subs_dom.getElementsByTagName('ytd-rich-item-renderer').length <= 110)
-                    WAIT_TIME = 2500
                 applyChannelFilters()
                 applyFilters()
                 setTimeout(() => {
                     moveVideos()
                 }, WAIT_TIME/2-500);
+                if (subs_dom.getElementsByTagName('ytd-rich-item-renderer').length <= 110)
+                    WAIT_TIME = 2500
             }, WAIT_TIME);
         }
     } else {
@@ -62,6 +62,19 @@ window.addEventListener('yt-navigate-finish', () => {
     }
 })
 
+new MutationObserver((mutations) => {
+    if (window.location.pathname != '/feed/subscriptions') {
+        for (let m of mutations) {
+            for (let n of m.addedNodes) {
+                if (n.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
+                    for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
+                        vid.style.display = 'inline-block'
+                }     
+            }
+        }
+    }
+}).observe(document.documentElement, { subtree: true, childList: true })
+
 function setup() {
     subs_dom = document.querySelector('ytd-browse[page-subtype="subscriptions"]')
     
@@ -69,8 +82,10 @@ function setup() {
         if (value.white_list != undefined) {
             white_list = value.white_list
             black_list = value.black_list
-            applyChannelFilters()
-            moveVideos()
+            setTimeout(() => {
+                applyChannelFilters()
+                moveVideos()
+            }, 500);
         }
         if (value.type != undefined) 
             fav_type = value.type
