@@ -22,7 +22,7 @@ let black_list = []
 let fav_type = "Videos"
 let fav_show = "Unwatched"
 
-let WAIT_TIME = 2500
+let WAIT_TIME = 1500
 
 setTimeout(() => {
     if (window.location.pathname == '/feed/subscriptions' && !is_setup)
@@ -48,10 +48,11 @@ window.addEventListener('yt-navigate-finish', () => {
                 applyChannelFilters()
                 applyFilters()
                 setTimeout(() => {
+                    removeDuplicates()
                     moveVideos()
-                }, WAIT_TIME/2-500);
+                }, 500);
                 if (subs_dom.getElementsByTagName('ytd-rich-item-renderer').length <= 110)
-                    WAIT_TIME = 2500
+                    WAIT_TIME = 1500
             }, WAIT_TIME);
         }
     } else {
@@ -178,11 +179,12 @@ function setup() {
             applyChannelFilters()
             applyFilters() 
             setTimeout(() => {
+                removeDuplicates()
                 moveVideos()
-            }, WAIT_TIME/2-500);
+            }, 500);
             subs_dom.querySelector('#ghost-cards').style.display = 'none'
             subs_dom.querySelector('#spinner').style.display = 'none'
-            WAIT_TIME += 2000
+            WAIT_TIME += 1500
         }, WAIT_TIME + 1000)
     }
 
@@ -204,8 +206,9 @@ function setup() {
             subs_dom.querySelector('#spinner').style.display = 'none'
             applyChannelFilters()
             applyFilters()
+            removeDuplicates()
             moveVideos()
-        }, WAIT_TIME);
+        }, WAIT_TIME + 1000);
     })
 
     let show = document.createElement('div')
@@ -521,6 +524,19 @@ function moveVideos() {
             }
         }
     }
+}
+
+function removeDuplicates() {
+    let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
+    let duplicates = []
+    for (let i = vids.length-1; i >= 0; i--) {
+        for (let j = 0; j < i; j++) {
+            if (vids[i].querySelector('#video-title').innerText == vids[j].querySelector('#video-title').innerText)
+                duplicates.push(vids[j])
+        }
+    }
+    for (let v of duplicates)
+        v.remove()
 }
 
 function passesWhiteList(channel, title) {
