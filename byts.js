@@ -510,7 +510,7 @@ function removeDuplicates() {
     let duplicates = []
     for (let i = vids.length-1; i >= 0; i--) {
         for (let j = 0; j < i; j++) {
-            if (vids[i].querySelector('#video-title').innerText == vids[j].querySelector('#video-title').innerText)
+            if (vids[i].querySelector('a').href == vids[j].querySelector('a').href)
                 duplicates.push(vids[j])
         }
     }
