@@ -30,15 +30,12 @@ setTimeout(() => {
 }, 2000);
 
 window.addEventListener('yt-navigate', () => {
-    browser.runtime.sendMessage({ type: 'page', message: window.location.pathname })
     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
 })
-browser.runtime.sendMessage({ type: 'page', message: window.location.pathname })
 browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
 document.querySelector('#video-preview').remove()
 
 window.addEventListener('yt-navigate-finish', () => {
-    browser.runtime.sendMessage({ type: 'page', message: window.location.pathname })
     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
     if (window.location.pathname == '/feed/subscriptions') {
         if(!is_setup) 
@@ -469,9 +466,8 @@ function applyFilters() {
             }
         }
     }
-    console.log(shorts)
     if (shorts)
-    subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].style.display = 'flex'
+        subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].style.display = 'flex'
     else
         subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].style.display = 'none'
 }
