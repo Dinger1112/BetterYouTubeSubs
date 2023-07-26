@@ -29,14 +29,16 @@ setTimeout(() => {
         setup()
 }, 2000);
 
-window.addEventListener('yt-navigate', () => {
+window.addEventListener('yt-navigate-start', () => {
+    browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
+})
+window.addEventListener('popstate', () => {
     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
 })
 browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
 document.querySelector('#video-preview').remove()
 
 window.addEventListener('yt-navigate-finish', () => {
-    browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
     if (window.location.pathname == '/feed/subscriptions') {
         if(!is_setup) 
             setup()
