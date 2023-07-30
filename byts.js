@@ -32,8 +32,12 @@ setTimeout(() => {
 window.addEventListener('yt-navigate-start', () => {
     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
 })
+window.addEventListener('yt-navigate-finish', () => {
+    browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
+})
 window.addEventListener('popstate', () => {
-    browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
+    if(subs_dom.getElementsByTagName('ytd-rich-item-renderer').length == 0)
+        browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
 })
 browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
 document.querySelector('#video-preview').remove()
@@ -171,7 +175,7 @@ function setup() {
         }, 20)
         setTimeout(() => {
             browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
-        }, 500)
+        }, 300)
         setTimeout(() => {
             continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
             continue_element.insertAdjacentElement('beforebegin', show_more)
@@ -189,7 +193,6 @@ function setup() {
 
     window.addEventListener('yt-navigate-finish', () => {
         setTimeout(() => {
-            browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
             continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
             continue_element.insertAdjacentElement('beforebegin', show_more)
             subs_dom.querySelector('#ghost-cards').style.display = 'none'
