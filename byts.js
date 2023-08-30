@@ -193,8 +193,10 @@ function setup() {
 
     window.addEventListener('yt-navigate-finish', () => {
         setTimeout(() => {
-            continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-            continue_element.insertAdjacentElement('beforebegin', show_more)
+            if (subs_dom.querySelector('.show_more') == null) {
+                continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                continue_element.insertAdjacentElement('beforebegin', show_more)
+            }
             subs_dom.querySelector('#ghost-cards').style.display = 'none'
             subs_dom.querySelector('#spinner').style.display = 'none'
         }, WAIT_TIME + 500);
@@ -455,7 +457,7 @@ function setup() {
 function applyFilters() {
     let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
     for (let vid of vids) {
-        if (vid.firstElementChild.firstElementChild.tagName != 'YTD-RICH-GRID-SLIM-MEDIA') {
+        if (vid.lastElementChild.firstElementChild.tagName != 'YTD-RICH-GRID-SLIM-MEDIA') {
             let progress = vid.querySelector('#progress')
             try {progress = progress.style.width.slice(0, -1)}
             catch(err) {progress = 0}
@@ -546,7 +548,7 @@ function applyChannelFilters() {
     let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
     let to_remove = []
     for (let v of vids) {
-        if (v.firstElementChild.firstElementChild.tagName != 'YTD-RICH-GRID-SLIM-MEDIA') {
+        if (v.lastElementChild.firstElementChild.tagName != 'YTD-RICH-GRID-SLIM-MEDIA') {
             let channel = v.querySelector('#channel-name').querySelector('a').innerText.toLowerCase()
             let title = v.querySelector('#video-title').innerText.toLowerCase()
             if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
