@@ -21,6 +21,7 @@ let white_list = []
 let black_list = []
 let fav_type = "Videos"
 let fav_show = "Unwatched"
+let slow_move_videos = false
 
 let WAIT_TIME = 1000
 let width = 0
@@ -80,11 +81,14 @@ function setup() {
     subs_dom = document.querySelector('ytd-browse[page-subtype="subscriptions"]')
     
     browser.storage.sync.get().then((value) => {
+        if (value.alt_move_vids != undefined && value.alt_move_vids == 'Yes')
+            slow_move_videos = true
         if (value.white_list != undefined) {
             white_list = value.white_list
             black_list = value.black_list
             setTimeout(() => {
-                width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
+                if (!slow_move_videos)
+                    width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
                 applyChannelFilters()
                 moveVideos()
             }, 500);
@@ -420,53 +424,55 @@ function applyFilters() {
 }
 
 function moveVideos() {
-    for (let vid of subs_dom.getElementsByTagName('ytd-rich-item-renderer')) {
-        if (!vid.hasAttribute('is-slim-media'))
-            vid.style.width = width + 'px'
-    }
-    for (let row of subs_dom.getElementsByTagName('ytd-rich-grid-row')) {
-        let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
-        let count = 0
-        for (let vid of row.getElementsByTagName('ytd-rich-item-renderer')) {
-            if (!vid.classList.contains('hidden'))
-                count++
+    if (slow_move_videos) {
+        let grid_rows = subs_dom.getElementsByTagName('ytd-rich-grid-row')
+        for (let index = 0; index < grid_rows.length; index++) {
+            let row = grid_rows[index]
+            let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
+            let row_contents = row.querySelector('#contents')
+            let row_length = 0
+            for (let v of row.getElementsByTagName('ytd-rich-item-renderer')) {
+                if (!v.classList.contains('hidden'))
+                    row_length++
+            }
+            if (row_length < items_per_row) {
+                for (let i = index+1; i < grid_rows.length; i++) {
+                    let next_row_contents = grid_rows[i].querySelector('#contents')
+                    while (row_length != items_per_row && next_row_contents.children.length != 0) {
+                        let first_child = next_row_contents.firstElementChild
+                        row_contents.appendChild(first_child)
+                        if (!first_child.classList.contains('hidden'))
+                            row_length++
+                    }
+                }
+            } else if (row_length > items_per_row) {
+                let next_row_contents = grid_rows[index+1].querySelector('#contents')
+                while (row_length != items_per_row) {
+                    let last_child = row_contents.lastElementChild
+                    next_row_contents.prepend(last_child)
+                    if (!last_child.classList.contains('hidden'))
+                        row_length--
+                }
+            }
         }
-        if (count != 0)
-            row.style.width = (100 * (count / items_per_row)) + '%'
-        else
-            row.style.width = 0 + '%'
-        
+    } else {
+        for (let vid of subs_dom.getElementsByTagName('ytd-rich-item-renderer')) {
+            if (!vid.hasAttribute('is-slim-media'))
+                vid.style.width = width + 'px'
+        }
+        for (let row of subs_dom.getElementsByTagName('ytd-rich-grid-row')) {
+            let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
+            let count = 0
+            for (let vid of row.getElementsByTagName('ytd-rich-item-renderer')) {
+                if (!vid.classList.contains('hidden'))
+                    count++
+            }
+            if (count != 0)
+                row.style.width = (100 * (count / items_per_row)) + '%'
+            else
+                row.style.width = 0 + '%'
+        }
     }
-    // let grid_rows = subs_dom.getElementsByTagName('ytd-rich-grid-row')
-    // for (let index = 0; index < grid_rows.length; index++) {
-    //     let row = grid_rows[index]
-    //     let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
-    //     let row_contents = row.querySelector('#contents')
-    //     let row_length = 0
-    //     for (let v of row.getElementsByTagName('ytd-rich-item-renderer')) {
-    //         if (!v.classList.contains('hidden'))
-    //             row_length++
-    //     }
-    //     if (row_length < items_per_row) {
-    //         for (let i = index+1; i < grid_rows.length; i++) {
-    //             let next_row_contents = grid_rows[i].querySelector('#contents')
-    //             while (row_length != items_per_row && next_row_contents.children.length != 0) {
-    //                 let first_child = next_row_contents.firstElementChild
-    //                 row_contents.appendChild(first_child)
-    //                 if (!first_child.classList.contains('hidden'))
-    //                     row_length++
-    //             }
-    //         }
-    //     } else if (row_length > items_per_row) {
-    //         let next_row_contents = grid_rows[index+1].querySelector('#contents')
-    //         while (row_length != items_per_row) {
-    //             let last_child = row_contents.lastElementChild
-    //             next_row_contents.prepend(last_child)
-    //             if (!last_child.classList.contains('hidden'))
-    //                 row_length--
-    //         }
-    //     }
-    // }
 }
 
 function removeDuplicates() {
