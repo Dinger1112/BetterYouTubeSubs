@@ -2,6 +2,8 @@
 Filter the videos that show up in your YouTube subscription feed to better manage the content you want to watch. <br>
 Firefox: https://addons.mozilla.org/en-US/firefox/addon/better-youtube-subs/
 
+This is something i made for myself that i'm just putting out into the world in case someone also finds it useful. If you're running into issues, i won't know to fix it or that something is wrong in the first place unless you contact me since all my testing is "it works on my machine." 
+
 ## Features
 ### Filter by
 - Type
