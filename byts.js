@@ -31,17 +31,17 @@ setTimeout(() => {
         setup()
 }, 2000);
 
-window.addEventListener('yt-navigate-start', () => {
-    browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
-})
-window.addEventListener('yt-navigate-finish', () => {
-    browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
-})
-window.addEventListener('popstate', () => {
-    if(subs_dom.getElementsByTagName('ytd-rich-item-renderer').length == 0)
-        browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
-})
-browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
+// window.addEventListener('yt-navigate-start', () => {
+//     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
+// })
+// window.addEventListener('yt-navigate-finish', () => {
+//     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
+// })
+// window.addEventListener('popstate', () => {
+//     if(subs_dom.getElementsByTagName('ytd-rich-item-renderer').length == 0)
+//         browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
+// })
+// browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
 document.querySelector('#video-preview').remove()
 
 window.addEventListener('yt-navigate-finish', () => {
@@ -99,61 +99,81 @@ function setup() {
             fav_show = value.show
     })
 
-    setTimeout(() => {
-        let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-        continue_element.insertAdjacentElement('beforebegin', show_more)
-        subs_dom.querySelector('#ghost-cards').classList.add('hidden')
-        subs_dom.querySelector('#spinner').classList.add('hidden')
-    }, 2000);
+    // setTimeout(() => {
+    //     let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+    //     continue_element.insertAdjacentElement('beforebegin', show_more)
+    //     subs_dom.querySelector('#ghost-cards').classList.add('hidden')
+    //     subs_dom.querySelector('#spinner').classList.add('hidden')
+    // }, 2000);
 
-    let show_more = document.createElement('div')
-    show_more.classList.add('btn', 'show_more')
-    show_more.innerText = 'SHOW MORE'
-    show_more.onclick = () => {
-        window.scrollBy(0, 1000)
-        subs_dom.querySelector('#ghost-cards').classList.remove('hidden')
-        subs_dom.querySelector('#spinner').classList.remove('hidden')
-        show_more.style.height = '2000px'
-        browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
-        window.scrollBy(0, -1)
-        setTimeout(() => {
-            window.scrollBy(0, 1)
-            show_more.style.height = 'initial'
-        }, 20)
-        setTimeout(() => {
-            browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
-            applyChannelFilters()
-            applyFilters() 
-            removeDuplicates()
-            moveVideos()
-            let i = setInterval(() => {
+    // let show_more = document.createElement('div')
+    // show_more.classList.add('btn', 'show_more')
+    // show_more.innerText = 'SHOW MORE'
+    // show_more.onclick = () => {
+    //     window.scrollBy(0, 1000)
+    //     subs_dom.querySelector('#ghost-cards').classList.remove('hidden')
+    //     subs_dom.querySelector('#spinner').classList.remove('hidden')
+    //     show_more.style.height = '2000px'
+    //     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
+    //     window.scrollBy(0, -1)
+    //     setTimeout(() => {
+    //         window.scrollBy(0, 1)
+    //         show_more.style.height = 'initial'
+    //     }, 20)
+        
+    //     setTimeout(() => {
+    //         browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
+    //         applyChannelFilters()
+    //         applyFilters() 
+    //         removeDuplicates()
+    //         moveVideos()
+    //         let i = setInterval(() => {
+    //             let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+    //             if (subs_dom.querySelector('.show_more') == null) {
+    //                 continue_element.insertAdjacentElement('beforebegin', show_more)
+    //                 show_more.removeAttribute('hidden')
+    //                 clearInterval(i)
+    //             }
+    //         }, 1000);
+    //         subs_dom.querySelector('#ghost-cards').classList.add('hidden')
+    //         subs_dom.querySelector('#spinner').classList.add('hidden')
+    //     }, WAIT_TIME)
+    // }
+
+    // window.addEventListener('yt-navigate-finish', () => {
+    //     setTimeout(() => {
+    //         let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+    //         continue_element.insertAdjacentElement('beforebegin', show_more)
+    //         subs_dom.querySelector('#ghost-cards').classList.add('hidden')
+    //         subs_dom.querySelector('#spinner').classList.add('hidden')
+    //     }, WAIT_TIME);
+    // })
+
+    new MutationObserver((mutations) => {
+        let nodes = mutations[0].addedNodes
+        for (let node of nodes) {
+            if (node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
+                window.scrollTo(0,0)
+                let block = document.createElement('div')
+                block.style.marginTop = window.innerHeight + 'px'
                 let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-                if (subs_dom.querySelector('.show_more') == null) {
-                    continue_element.insertAdjacentElement('beforebegin', show_more)
-                    show_more.removeAttribute('hidden')
-                    clearInterval(i)
-                }
-            }, 1000);
-            subs_dom.querySelector('#ghost-cards').classList.add('hidden')
-            subs_dom.querySelector('#spinner').classList.add('hidden')
-        }, WAIT_TIME)
-    }
-
-    window.addEventListener('yt-navigate-finish', () => {
-        setTimeout(() => {
-            let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-            continue_element.insertAdjacentElement('beforebegin', show_more)
-            subs_dom.querySelector('#ghost-cards').classList.add('hidden')
-            subs_dom.querySelector('#spinner').classList.add('hidden')
-        }, WAIT_TIME);
-    })
+                continue_element.insertAdjacentElement('beforebegin', block)
+                setTimeout(() => {
+                    applyChannelFilters()
+                    applyFilters()
+                    removeDuplicates()
+                    moveVideos()
+                }, WAIT_TIME)
+            }
+        }
+    }).observe(subs_dom.querySelector('#contents'), {childList: true})
 
     window.addEventListener('resize', () => {
         setTimeout(() => {
-            continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-            continue_element.insertAdjacentElement('beforebegin', show_more)
-            subs_dom.querySelector('#ghost-cards').classList.add('hidden')
-            subs_dom.querySelector('#spinner').classList.add('hidden')
+            // continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+            // continue_element.insertAdjacentElement('beforebegin', show_more)
+            // subs_dom.querySelector('#ghost-cards').classList.add('hidden')
+            // subs_dom.querySelector('#spinner').classList.add('hidden')
             applyChannelFilters()
             applyFilters()
             removeDuplicates()
