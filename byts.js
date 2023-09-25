@@ -152,8 +152,7 @@ function setup() {
     new MutationObserver((mutations) => {
         let nodes = mutations[0].addedNodes
         for (let node of nodes) {
-            if (node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
-                window.scrollTo(0,0)
+            if (node.tagName == 'YTD-RICH-GRID-ROW' || node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
                 let block = document.createElement('div')
                 block.style.marginTop = window.innerHeight + 'px'
                 let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
@@ -163,6 +162,7 @@ function setup() {
                     applyFilters()
                     removeDuplicates()
                     moveVideos()
+                    window.scrollTo(0,0)
                 }, WAIT_TIME)
             }
         }
@@ -174,6 +174,11 @@ function setup() {
             // continue_element.insertAdjacentElement('beforebegin', show_more)
             // subs_dom.querySelector('#ghost-cards').classList.add('hidden')
             // subs_dom.querySelector('#spinner').classList.add('hidden')
+            window.scrollTo(0,0)
+            let block = document.createElement('div')
+            block.style.marginTop = window.innerHeight + 'px'
+            let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+            continue_element.insertAdjacentElement('beforebegin', block)
             applyChannelFilters()
             applyFilters()
             removeDuplicates()
