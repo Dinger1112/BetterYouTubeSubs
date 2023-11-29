@@ -104,9 +104,9 @@ show.addEventListener('change', () => {
     browser.storage.sync.set({show: show.value})
 })
 
-alt_move_vids.addEventListener('change', () => {
-    browser.storage.sync.set({alt_move_vids: alt_move_vids.value})
-})
+// alt_move_vids.addEventListener('change', () => {
+//     browser.storage.sync.set({alt_move_vids: alt_move_vids.value})
+// })
 
 browser.storage.sync.get().then((value) => {
     if (value.white_list != undefined){
