@@ -149,24 +149,29 @@ function setup() {
     //     }, WAIT_TIME);
     // })
 
-    new MutationObserver((mutations) => {
-        let nodes = mutations[0].addedNodes
-        for (let node of nodes) {
-            if (node.tagName == 'YTD-RICH-GRID-ROW' || node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
-                let block = document.createElement('div')
-                block.style.marginTop = window.innerHeight + 'px'
-                let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-                continue_element.insertAdjacentElement('beforebegin', block)
-                setTimeout(() => {
-                    applyChannelFilters()
-                    applyFilters()
-                    removeDuplicates()
-                    moveVideos()
-                    window.scrollTo(0,0)
-                }, WAIT_TIME)
+    let block = document.createElement('div')
+    block.style.marginTop = window.innerHeight + 'px'
+    block.style.width = '100%'
+    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+    continue_element.insertAdjacentElement('beforebegin', block)
+    setTimeout(() => {
+        new MutationObserver((mutations) => {
+            let nodes = mutations[0].addedNodes
+            for (let node of nodes) {
+                if (node.tagName == 'YTD-RICH-GRID-ROW' || node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
+                    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                    continue_element.insertAdjacentElement('beforebegin', block)
+                    setTimeout(() => {
+                        applyChannelFilters()
+                        applyFilters()
+                        removeDuplicates()
+                        moveVideos()
+                        window.scrollTo(0,0)
+                    }, WAIT_TIME)
+                }
             }
-        }
-    }).observe(subs_dom.querySelector('#contents'), {childList: true})
+        }).observe(subs_dom.querySelector('#contents'), {childList: true})
+    }, 1000);
 
     window.addEventListener('resize', () => {
         setTimeout(() => {
@@ -449,38 +454,38 @@ function applyFilters() {
 }
 
 function moveVideos() {
-    if (slow_move_videos) {
-        let grid_rows = subs_dom.getElementsByTagName('ytd-rich-grid-row')
-        for (let index = 0; index < grid_rows.length; index++) {
-            let row = grid_rows[index]
-            let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
-            let row_contents = row.querySelector('#contents')
-            let row_length = 0
-            for (let v of row.getElementsByTagName('ytd-rich-item-renderer')) {
-                if (!v.classList.contains('hidden'))
-                    row_length++
-            }
-            if (row_length < items_per_row) {
-                for (let i = index+1; i < grid_rows.length; i++) {
-                    let next_row_contents = grid_rows[i].querySelector('#contents')
-                    while (row_length != items_per_row && next_row_contents.children.length != 0) {
-                        let first_child = next_row_contents.firstElementChild
-                        row_contents.appendChild(first_child)
-                        if (!first_child.classList.contains('hidden'))
-                            row_length++
-                    }
-                }
-            } else if (row_length > items_per_row) {
-                let next_row_contents = grid_rows[index+1].querySelector('#contents')
-                while (row_length != items_per_row) {
-                    let last_child = row_contents.lastElementChild
-                    next_row_contents.prepend(last_child)
-                    if (!last_child.classList.contains('hidden'))
-                        row_length--
-                }
-            }
-        }
-    } else {
+    // if (slow_move_videos) {
+    //     let grid_rows = subs_dom.getElementsByTagName('ytd-rich-grid-row')
+    //     for (let index = 0; index < grid_rows.length; index++) {
+    //         let row = grid_rows[index]
+    //         let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
+    //         let row_contents = row.querySelector('#contents')
+    //         let row_length = 0
+    //         for (let v of row.getElementsByTagName('ytd-rich-item-renderer')) {
+    //             if (!v.classList.contains('hidden'))
+    //                 row_length++
+    //         }
+    //         if (row_length < items_per_row) {
+    //             for (let i = index+1; i < grid_rows.length; i++) {
+    //                 let next_row_contents = grid_rows[i].querySelector('#contents')
+    //                 while (row_length != items_per_row && next_row_contents.children.length != 0) {
+    //                     let first_child = next_row_contents.firstElementChild
+    //                     row_contents.appendChild(first_child)
+    //                     if (!first_child.classList.contains('hidden'))
+    //                         row_length++
+    //                 }
+    //             }
+    //         } else if (row_length > items_per_row) {
+    //             let next_row_contents = grid_rows[index+1].querySelector('#contents')
+    //             while (row_length != items_per_row) {
+    //                 let last_child = row_contents.lastElementChild
+    //                 next_row_contents.prepend(last_child)
+    //                 if (!last_child.classList.contains('hidden'))
+    //                     row_length--
+    //             }
+    //         }
+    //     }
+    // } else {
         for (let vid of subs_dom.getElementsByTagName('ytd-rich-item-renderer')) {
             if (!vid.hasAttribute('is-slim-media'))
                 vid.style.width = width + 'px'
@@ -497,7 +502,7 @@ function moveVideos() {
             else
                 row.style.width = 0 + '%'
         }
-    }
+    //}
 }
 
 function removeDuplicates() {
@@ -536,7 +541,7 @@ function applyChannelFilters() {
     let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
     let to_remove = []
     for (let v of vids) {
-        if (v.lastElementChild.firstElementChild.tagName != 'YTD-RICH-GRID-SLIM-MEDIA') {
+        if (!v.hasAttribute('is-slim-media')) {
             let channel = v.querySelector('#channel-name').querySelector('a').innerText.toLowerCase()
             let title = v.querySelector('#video-title').innerText.toLowerCase()
             if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
