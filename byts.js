@@ -81,14 +81,12 @@ function setup() {
     subs_dom = document.querySelector('ytd-browse[page-subtype="subscriptions"]')
     
     browser.storage.sync.get().then((value) => {
-        if (value.alt_move_vids != undefined && value.alt_move_vids == 'Yes')
-            slow_move_videos = true
+        //if (value.alt_move_vids != undefined && value.alt_move_vids == 'Yes')
+            //slow_move_videos = true
         if (value.white_list != undefined) {
             white_list = value.white_list
             black_list = value.black_list
             setTimeout(() => {
-                if (!slow_move_videos)
-                    width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
                 applyChannelFilters()
                 moveVideos()
             }, 500);
@@ -97,6 +95,8 @@ function setup() {
             fav_type = value.type
         if (value.show != undefined)
             fav_show = value.show
+        //if (!slow_move_videos)
+            width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
     })
 
     // setTimeout(() => {
@@ -152,9 +152,9 @@ function setup() {
     let block = document.createElement('div')
     block.style.marginTop = window.innerHeight + 'px'
     block.style.width = '100%'
-    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-    continue_element.insertAdjacentElement('beforebegin', block)
     setTimeout(() => {
+        let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+        continue_element.insertAdjacentElement('beforebegin', block)
         new MutationObserver((mutations) => {
             let nodes = mutations[0].addedNodes
             for (let node of nodes) {
@@ -180,8 +180,6 @@ function setup() {
             // subs_dom.querySelector('#ghost-cards').classList.add('hidden')
             // subs_dom.querySelector('#spinner').classList.add('hidden')
             window.scrollTo(0,0)
-            let block = document.createElement('div')
-            block.style.marginTop = window.innerHeight + 'px'
             let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
             continue_element.insertAdjacentElement('beforebegin', block)
             applyChannelFilters()
