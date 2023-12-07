@@ -24,7 +24,7 @@ let fav_show = "Unwatched"
 let slow_move_videos = false
 
 let WAIT_TIME = 1000
-let width = 0
+let width = 314
 
 setTimeout(() => {
     if (window.location.pathname == '/feed/subscriptions' && !is_setup)
@@ -79,6 +79,7 @@ new MutationObserver((mutations) => {
 
 function setup() {
     subs_dom = document.querySelector('ytd-browse[page-subtype="subscriptions"]')
+    width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
     
     browser.storage.sync.get().then((value) => {
         //if (value.alt_move_vids != undefined && value.alt_move_vids == 'Yes')
@@ -96,7 +97,7 @@ function setup() {
         if (value.show != undefined)
             fav_show = value.show
         //if (!slow_move_videos)
-            width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
+            //width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
     })
 
     // setTimeout(() => {
