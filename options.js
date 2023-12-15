@@ -9,7 +9,7 @@ const export_btn = document.getElementById('export')
 const import_btn = document.getElementById('import')
 const type = document.getElementById('type')
 const show = document.getElementById('show')
-const alt_move_vids = document.getElementById('alt_move_vids')
+//const alt_move_vids = document.getElementById('alt_move_vids')
 
 white_btn.addEventListener('click', () => {
     let channel_input = document.getElementById('white_channel_input')
@@ -132,12 +132,12 @@ browser.storage.sync.get().then((value) => {
         show.value = 'Unwatched'
         browser.storage.sync.set({show: show.value})
     }
-    if (value.alt_move_vids != undefined)
-        alt_move_vids.value = value.alt_move_vids
-    else {
-        alt_move_vids.value = 'No'
-        browser.storage.sync.set({alt_move_vids: alt_move_vids.value})
-    }
+    // if (value.alt_move_vids != undefined)
+    //     alt_move_vids.value = value.alt_move_vids
+    // else {
+    //     alt_move_vids.value = 'No'
+    //     browser.storage.sync.set({alt_move_vids: alt_move_vids.value})
+    // }
 }).then(() => {
     for (let i of white_list) 
         ul_white.appendChild(createLI(i.channel, i.title))
