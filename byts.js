@@ -180,13 +180,12 @@ function setup() {
             // continue_element.insertAdjacentElement('beforebegin', show_more)
             // subs_dom.querySelector('#ghost-cards').classList.add('hidden')
             // subs_dom.querySelector('#spinner').classList.add('hidden')
-            window.scrollTo(0,0)
-            let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-            continue_element.insertAdjacentElement('beforebegin', block)
             applyChannelFilters()
             applyFilters()
             removeDuplicates()
             moveVideos()
+            let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+            continue_element.insertAdjacentElement('beforebegin', block)
         }, WAIT_TIME);
     })
 
