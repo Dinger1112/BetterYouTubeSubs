@@ -140,7 +140,7 @@ function setup() {
             let nodes = mutations[0].addedNodes
             for (let node of nodes) {
                 if (node.tagName == 'YTD-RICH-GRID-ROW' || node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
-                    continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
                     continue_element.insertAdjacentElement('beforebegin', block)
                     setTimeout(() => {
                         applyChannelFilters()
@@ -159,13 +159,13 @@ function setup() {
             if(!is_setup) 
                 setup()
             else {
-                continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-                continue_element.insertAdjacentElement('beforebegin', block)
                 setTimeout(() => {
                     applyChannelFilters()
                     applyFilters()
                     removeDuplicates()
                     moveVideos()
+                    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                    continue_element.insertAdjacentElement('beforebegin', block)
                 }, WAIT_TIME);
             }
         } else {
