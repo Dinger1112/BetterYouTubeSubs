@@ -44,26 +44,6 @@ setTimeout(() => {
 // browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
 document.querySelector('#video-preview').remove()
 
-window.addEventListener('yt-navigate-finish', () => {
-    if (window.location.pathname == '/feed/subscriptions') {
-        if(!is_setup) 
-            setup()
-        else {
-            setTimeout(() => {
-                applyChannelFilters()
-                applyFilters()
-                removeDuplicates()
-                moveVideos()
-            }, WAIT_TIME);
-        }
-    } else {
-        setTimeout(() => {
-            for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
-                vid.classList.remove('hidden')
-        }, 2000);
-    }
-})
-
 new MutationObserver((mutations) => {
     if (window.location.pathname != '/feed/subscriptions') {
         for (let m of mutations) {
@@ -160,7 +140,7 @@ function setup() {
             let nodes = mutations[0].addedNodes
             for (let node of nodes) {
                 if (node.tagName == 'YTD-RICH-GRID-ROW' || node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
-                    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                    continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
                     continue_element.insertAdjacentElement('beforebegin', block)
                     setTimeout(() => {
                         applyChannelFilters()
@@ -173,6 +153,28 @@ function setup() {
             }
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
     }, 1000);
+
+    window.addEventListener('yt-navigate-finish', () => {
+        if (window.location.pathname == '/feed/subscriptions') {
+            if(!is_setup) 
+                setup()
+            else {
+                continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                continue_element.insertAdjacentElement('beforebegin', block)
+                setTimeout(() => {
+                    applyChannelFilters()
+                    applyFilters()
+                    removeDuplicates()
+                    moveVideos()
+                }, WAIT_TIME);
+            }
+        } else {
+            setTimeout(() => {
+                for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
+                    vid.classList.remove('hidden')
+            }, 2000);
+        }
+    })
 
     window.addEventListener('resize', () => {
         setTimeout(() => {
