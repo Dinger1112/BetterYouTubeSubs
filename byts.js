@@ -57,6 +57,11 @@ new MutationObserver((mutations) => {
     }
 }).observe(document.documentElement, { subtree: true, childList: true })
 
+window.addEventListener('yt-navigate-finish', () => {
+    if (window.location.pathname == '/feed/subscriptions' && !is_setup)
+        setup()
+})
+
 function setup() {
     subs_dom = document.querySelector('ytd-browse[page-subtype="subscriptions"]')
     width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
@@ -156,9 +161,7 @@ function setup() {
 
     window.addEventListener('yt-navigate-finish', () => {
         if (window.location.pathname == '/feed/subscriptions') {
-            if(!is_setup) 
-                setup()
-            else {
+            if(is_setup) {
                 setTimeout(() => {
                     applyChannelFilters()
                     applyFilters()
