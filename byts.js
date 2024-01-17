@@ -31,6 +31,13 @@ setTimeout(() => {
         setup()
 }, 2000);
 
+window.addEventListener('yt-navigate-finish', () => {
+    setTimeout(() => {
+        if (window.location.pathname == '/feed/subscriptions' && !is_setup)
+            setup()
+    }, 2000);
+})
+
 // window.addEventListener('yt-navigate-start', () => {
 //     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
 // })
@@ -56,11 +63,6 @@ new MutationObserver((mutations) => {
         }
     }
 }).observe(document.documentElement, { subtree: true, childList: true })
-
-window.addEventListener('yt-navigate-finish', () => {
-    if (window.location.pathname == '/feed/subscriptions' && !is_setup)
-        setup()
-})
 
 function setup() {
     subs_dom = document.querySelector('ytd-browse[page-subtype="subscriptions"]')
