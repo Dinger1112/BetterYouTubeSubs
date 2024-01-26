@@ -154,6 +154,8 @@ function setup() {
                         applyFilters()
                         removeDuplicates()
                         moveVideos()
+                        continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                        continue_element.insertAdjacentElement('beforebegin', block)
                         window.scrollTo(0,0)
                     }, WAIT_TIME)
                 }
@@ -164,12 +166,14 @@ function setup() {
     window.addEventListener('yt-navigate-finish', () => {
         if (window.location.pathname == '/feed/subscriptions') {
             if(is_setup) {
+                let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                continue_element.insertAdjacentElement('beforebegin', block)
                 setTimeout(() => {
                     applyChannelFilters()
                     applyFilters()
                     removeDuplicates()
                     moveVideos()
-                    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                    continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
                     continue_element.insertAdjacentElement('beforebegin', block)
                 }, WAIT_TIME);
             }
