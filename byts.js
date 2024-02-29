@@ -196,6 +196,7 @@ function setup() {
         type_status.innerText = ''
         favorite.innerText = '☆'
         setTimeout(() => {
+            width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
             // continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
             // continue_element.insertAdjacentElement('beforebegin', show_more)
             // subs_dom.querySelector('#ghost-cards').classList.add('hidden')
