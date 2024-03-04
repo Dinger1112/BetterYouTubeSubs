@@ -185,29 +185,29 @@ function setup() {
         }
     })
 
-    window.addEventListener('resize', () => {
-        unwatched = true
-        continue_watching = true
-        finished = true
-        show_status.innerText = ''
-        videos = true
-        shorts = true
-        live_streams = true
-        type_status.innerText = ''
-        favorite.innerText = '☆'
-        setTimeout(() => {
-            // continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-            // continue_element.insertAdjacentElement('beforebegin', show_more)
-            // subs_dom.querySelector('#ghost-cards').classList.add('hidden')
-            // subs_dom.querySelector('#spinner').classList.add('hidden')
-            applyChannelFilters()
-            applyFilters()
-            removeDuplicates()
-            moveVideos()
-            let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-            continue_element.insertAdjacentElement('beforebegin', block)
-        }, WAIT_TIME);
-    })
+    // window.addEventListener('resize', () => {
+    //     unwatched = true
+    //     continue_watching = true
+    //     finished = true
+    //     show_status.innerText = ''
+    //     videos = true
+    //     shorts = true
+    //     live_streams = true
+    //     type_status.innerText = ''
+    //     favorite.innerText = '☆'
+    //     setTimeout(() => {
+    //         // continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+    //         // continue_element.insertAdjacentElement('beforebegin', show_more)
+    //         // subs_dom.querySelector('#ghost-cards').classList.add('hidden')
+    //         // subs_dom.querySelector('#spinner').classList.add('hidden')
+    //         applyChannelFilters()
+    //         applyFilters()
+    //         removeDuplicates()
+    //         moveVideos()
+    //         let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+    //         continue_element.insertAdjacentElement('beforebegin', block)
+    //     }, WAIT_TIME);
+    // })
 
     let show = document.createElement('div')
 
