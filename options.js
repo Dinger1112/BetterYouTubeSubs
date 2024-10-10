@@ -9,7 +9,6 @@ const export_btn = document.getElementById('export')
 const import_btn = document.getElementById('import')
 const type = document.getElementById('type')
 const show = document.getElementById('show')
-//const alt_move_vids = document.getElementById('alt_move_vids')
 
 white_btn.addEventListener('click', () => {
     let channel_input = document.getElementById('white_channel_input')

@@ -21,10 +21,10 @@ let white_list = []
 let black_list = []
 let fav_type = "Videos"
 let fav_show = "Unwatched"
-let slow_move_videos = false
 
-let WAIT_TIME = 1000
-let width = 314
+let WAIT_TIME = 1500
+//let width = 314
+let num_of_vids_on_page = 0
 
 setTimeout(() => {
     if (window.location.pathname == '/feed/subscriptions' && !is_setup)
@@ -38,104 +38,39 @@ window.addEventListener('yt-navigate-finish', () => {
     }, 2000);
 })
 
-// window.addEventListener('yt-navigate-start', () => {
-//     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
-// })
-// window.addEventListener('yt-navigate-finish', () => {
-//     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
-// })
-// window.addEventListener('popstate', () => {
-//     if(subs_dom.getElementsByTagName('ytd-rich-item-renderer').length == 0)
-//         browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
-// })
-// browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
 document.querySelector('#video-preview').remove()
 
-new MutationObserver((mutations) => {
-    if (window.location.pathname != '/feed/subscriptions') {
-        for (let m of mutations) {
-            for (let n of m.addedNodes) {
-                if (n.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
-                    for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
-                        vid.classList.remove('hidden')
-                }     
-            }
-        }
-    }
-}).observe(document.documentElement, { subtree: true, childList: true })
+// new MutationObserver((mutations) => {
+//     if (window.location.pathname != '/feed/subscriptions') {
+//         for (let m of mutations) {
+//             for (let n of m.addedNodes) {
+//                 if (n.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
+//                     for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
+//                         vid.classList.remove('hidden')
+//                 }     
+//             }
+//         }
+//     }
+// }).observe(document.documentElement, { subtree: true, childList: true })
 
 function setup() {
     subs_dom = document.querySelector('ytd-browse[page-subtype="subscriptions"]')
-    width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
+    //width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
     
     browser.storage.sync.get().then((value) => {
-        //if (value.alt_move_vids != undefined && value.alt_move_vids == 'Yes')
-            //slow_move_videos = true
         if (value.white_list != undefined) {
             white_list = value.white_list
             black_list = value.black_list
             setTimeout(() => {
                 applyChannelFilters()
-                moveVideos()
+                //moveVideos()
             }, 500);
         }
         if (value.type != undefined) 
             fav_type = value.type
         if (value.show != undefined)
             fav_show = value.show
-        //if (!slow_move_videos)
-            //width = subs_dom.querySelector('ytd-rich-item-renderer').offsetWidth
     })
-
-    // setTimeout(() => {
-    //     let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-    //     continue_element.insertAdjacentElement('beforebegin', show_more)
-    //     subs_dom.querySelector('#ghost-cards').classList.add('hidden')
-    //     subs_dom.querySelector('#spinner').classList.add('hidden')
-    // }, 2000);
-
-    // let show_more = document.createElement('div')
-    // show_more.classList.add('btn', 'show_more')
-    // show_more.innerText = 'SHOW MORE'
-    // show_more.onclick = () => {
-    //     window.scrollBy(0, 1000)
-    //     subs_dom.querySelector('#ghost-cards').classList.remove('hidden')
-    //     subs_dom.querySelector('#spinner').classList.remove('hidden')
-    //     show_more.style.height = '2000px'
-    //     browser.runtime.sendMessage({ type: 'stop_loading_vids', message: false })
-    //     window.scrollBy(0, -1)
-    //     setTimeout(() => {
-    //         window.scrollBy(0, 1)
-    //         show_more.style.height = 'initial'
-    //     }, 20)
-        
-    //     setTimeout(() => {
-    //         browser.runtime.sendMessage({ type: 'stop_loading_vids', message: true })
-    //         applyChannelFilters()
-    //         applyFilters() 
-    //         removeDuplicates()
-    //         moveVideos()
-    //         let i = setInterval(() => {
-    //             let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-    //             if (subs_dom.querySelector('.show_more') == null) {
-    //                 continue_element.insertAdjacentElement('beforebegin', show_more)
-    //                 show_more.removeAttribute('hidden')
-    //                 clearInterval(i)
-    //             }
-    //         }, 1000);
-    //         subs_dom.querySelector('#ghost-cards').classList.add('hidden')
-    //         subs_dom.querySelector('#spinner').classList.add('hidden')
-    //     }, WAIT_TIME)
-    // }
-
-    // window.addEventListener('yt-navigate-finish', () => {
-    //     setTimeout(() => {
-    //         let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-    //         continue_element.insertAdjacentElement('beforebegin', show_more)
-    //         subs_dom.querySelector('#ghost-cards').classList.add('hidden')
-    //         subs_dom.querySelector('#spinner').classList.add('hidden')
-    //     }, WAIT_TIME);
-    // })
 
     let block = document.createElement('div')
     block.style.marginTop = window.innerHeight + 'px'
@@ -143,22 +78,20 @@ function setup() {
     setTimeout(() => {
         let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
         continue_element.insertAdjacentElement('beforebegin', block)
-        new MutationObserver((mutations) => {
-            let nodes = mutations[0].addedNodes
-            for (let node of nodes) {
-                if (node.tagName == 'YTD-RICH-GRID-ROW' || node.tagName == 'YTD-CONTINUATION-ITEM-RENDERER') {
+        num_of_vids_on_page = subs_dom.querySelector('#contents').childNodes.length
+        new MutationObserver(() => {
+            let n = subs_dom.querySelector('#contents').childNodes.length
+            if (n > num_of_vids_on_page) {
+                setTimeout(() => {
+                    applyChannelFilters()
+                    applyFilters()
+                    //removeDuplicates()
+                    //moveVideos()
                     let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
                     continue_element.insertAdjacentElement('beforebegin', block)
-                    setTimeout(() => {
-                        applyChannelFilters()
-                        applyFilters()
-                        removeDuplicates()
-                        moveVideos()
-                        continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-                        continue_element.insertAdjacentElement('beforebegin', block)
-                        window.scrollTo(0,0)
-                    }, WAIT_TIME)
-                }
+                    window.scrollTo(0,0)
+                }, WAIT_TIME)
+                num_of_vids_on_page = n
             }
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
     }, 1000);
@@ -171,43 +104,34 @@ function setup() {
                 setTimeout(() => {
                     applyChannelFilters()
                     applyFilters()
-                    removeDuplicates()
-                    moveVideos()
-                    continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-                    continue_element.insertAdjacentElement('beforebegin', block)
+                    //removeDuplicates()
+                    //moveVideos()
+                    //continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                    //continue_element.insertAdjacentElement('beforebegin', block)
                 }, WAIT_TIME);
             }
         } else {
-            setTimeout(() => {
-                for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
-                    vid.classList.remove('hidden')
-            }, 2000);
+            // setTimeout(() => {
+            //     for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
+            //         vid.classList.remove('hidden')
+            // }, 2000);
         }
     })
 
-    // window.addEventListener('resize', () => {
-    //     unwatched = true
-    //     continue_watching = true
-    //     finished = true
-    //     show_status.innerText = ''
-    //     videos = true
-    //     shorts = true
-    //     live_streams = true
-    //     type_status.innerText = ''
-    //     favorite.innerText = '☆'
-    //     setTimeout(() => {
-    //         // continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-    //         // continue_element.insertAdjacentElement('beforebegin', show_more)
-    //         // subs_dom.querySelector('#ghost-cards').classList.add('hidden')
-    //         // subs_dom.querySelector('#spinner').classList.add('hidden')
-    //         applyChannelFilters()
-    //         applyFilters()
-    //         removeDuplicates()
-    //         moveVideos()
-    //         let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-    //         continue_element.insertAdjacentElement('beforebegin', block)
-    //     }, WAIT_TIME);
-    // })
+    window.addEventListener('resize', () => {
+        if (window.location.pathname == '/feed/subscriptions' && is_setup) {
+            let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+            continue_element.insertAdjacentElement('beforebegin', block)
+            setTimeout(() => {
+                applyChannelFilters()
+                applyFilters()
+                removeDuplicates()
+                //moveVideos()
+                //continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                //continue_element.insertAdjacentElement('beforebegin', block)
+            }, WAIT_TIME);
+        }
+    })
 
     let show = document.createElement('div')
 
@@ -227,7 +151,7 @@ function setup() {
     show_dropdown.onclick = () => {
         favorite.innerText = '☆'
         applyFilters()
-        moveVideos()
+        //moveVideos()
     }
 
     let show_all = document.createElement('div')
@@ -289,7 +213,7 @@ function setup() {
     type_dropdown.onclick = () => {
         favorite.innerText = '☆'
         applyFilters()
-        moveVideos()
+        //moveVideos()
     }
 
     let type_all = document.createElement('div')
@@ -417,7 +341,7 @@ function setup() {
             favorite.innerText = '★'
         }
         applyFilters()
-        moveVideos()
+        //moveVideos()
     }
 
     let status = document.createElement('div')
@@ -471,57 +395,24 @@ function applyFilters() {
         subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].classList.add('hidden')
 }
 
-function moveVideos() {
-    // if (slow_move_videos) {
-    //     let grid_rows = subs_dom.getElementsByTagName('ytd-rich-grid-row')
-    //     for (let index = 0; index < grid_rows.length; index++) {
-    //         let row = grid_rows[index]
-    //         let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
-    //         let row_contents = row.querySelector('#contents')
-    //         let row_length = 0
-    //         for (let v of row.getElementsByTagName('ytd-rich-item-renderer')) {
-    //             if (!v.classList.contains('hidden'))
-    //                 row_length++
-    //         }
-    //         if (row_length < items_per_row) {
-    //             for (let i = index+1; i < grid_rows.length; i++) {
-    //                 let next_row_contents = grid_rows[i].querySelector('#contents')
-    //                 while (row_length != items_per_row && next_row_contents.children.length != 0) {
-    //                     let first_child = next_row_contents.firstElementChild
-    //                     row_contents.appendChild(first_child)
-    //                     if (!first_child.classList.contains('hidden'))
-    //                         row_length++
-    //                 }
-    //             }
-    //         } else if (row_length > items_per_row) {
-    //             let next_row_contents = grid_rows[index+1].querySelector('#contents')
-    //             while (row_length != items_per_row) {
-    //                 let last_child = row_contents.lastElementChild
-    //                 next_row_contents.prepend(last_child)
-    //                 if (!last_child.classList.contains('hidden'))
-    //                     row_length--
-    //             }
-    //         }
-    //     }
-    // } else {
-        for (let vid of subs_dom.getElementsByTagName('ytd-rich-item-renderer')) {
-            if (!vid.hasAttribute('is-slim-media'))
-                vid.style.width = width + 'px'
-        }
-        for (let row of subs_dom.getElementsByTagName('ytd-rich-grid-row')) {
-            let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
-            let count = 0
-            for (let vid of row.getElementsByTagName('ytd-rich-item-renderer')) {
-                if (!vid.classList.contains('hidden'))
-                    count++
-            }
-            if (count != 0)
-                row.style.width = (100 * (count / items_per_row)) + '%'
-            else
-                row.style.width = 0 + '%'
-        }
-    //}
-}
+// function moveVideos() {
+//     // for (let vid of subs_dom.getElementsByTagName('ytd-rich-item-renderer')) {
+//     //     if (!vid.hasAttribute('is-slim-media'))
+//     //         vid.style.width = width + 'px'
+//     // }
+//     for (let row of subs_dom.getElementsByTagName('ytd-rich-grid-row')) {
+//         //let items_per_row = Number(getComputedStyle(row).getPropertyValue('--ytd-rich-grid-items-per-row'))
+//         let count = 0
+//         for (let vid of row.getElementsByTagName('ytd-rich-item-renderer')) {
+//             if (!vid.classList.contains('hidden'))
+//                 count++
+//         }
+//         // if (count != 0)
+//         //     row.style.width = (100 * (count / items_per_row)) + '%'
+//         // else
+//         //     row.style.width = 0 + '%'
+//     }
+// }
 
 function removeDuplicates() {
     let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
@@ -532,8 +423,10 @@ function removeDuplicates() {
                 duplicates.push(vids[j])
         }
     }
-    for (let v of duplicates)
+    for (let v of duplicates) {
+        console.log('duplicate removed')
         v.remove()
+    }
 }
 
 function passesWhiteList(channel, title) {
