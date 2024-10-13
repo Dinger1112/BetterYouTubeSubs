@@ -99,23 +99,23 @@ function setup() {
     window.addEventListener('yt-navigate-finish', () => {
         if (window.location.pathname == '/feed/subscriptions') {
             if(is_setup) {
-                let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-                continue_element.insertAdjacentElement('beforebegin', block)
+                //let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                //continue_element.insertAdjacentElement('beforebegin', block)
                 setTimeout(() => {
                     applyChannelFilters()
                     applyFilters()
                     //removeDuplicates()
                     //moveVideos()
-                    //continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-                    //continue_element.insertAdjacentElement('beforebegin', block)
+                    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                    continue_element.insertAdjacentElement('beforebegin', block)
                 }, WAIT_TIME);
             }
-        } else {
+        } //else {
             // setTimeout(() => {
             //     for (let vid of document.getElementsByTagName('ytd-rich-item-renderer'))
             //         vid.classList.remove('hidden')
             // }, 2000);
-        }
+        //}
     })
 
     window.addEventListener('resize', () => {
