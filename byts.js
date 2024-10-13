@@ -14,11 +14,13 @@ let fav_show = "Unwatched"
 let WAIT_TIME = 1500
 let num_of_vids_on_page = 0
 
+//Runs setup if the window starts on the subs page 
 setTimeout(() => {
     if (window.location.pathname == '/feed/subscriptions' && !is_setup)
         setup()
 }, 2000);
 
+//Adds an event listener to run setup when the window goes to the subs page for the first time
 window.addEventListener('yt-navigate-finish', () => {
     setTimeout(() => {
         if (window.location.pathname == '/feed/subscriptions' && !is_setup)
@@ -26,25 +28,28 @@ window.addEventListener('yt-navigate-finish', () => {
     }, 2000);
 })
 
+//Removes video preview on hover cause i don't like them
 document.querySelector('#video-preview').remove()
 
 function setup() {
     subs_dom = document.querySelector('ytd-browse[page-subtype="subscriptions"]')
     
-    browser.storage.sync.get().then((value) => {
-        if (value.white_list != undefined) {
-            white_list = value.white_list
-            black_list = value.black_list
+    //Loads the black/white list and favorites from the options page
+    browser.storage.sync.get().then((storage) => {
+        if (storage.white_list != undefined) {
+            white_list = storage.white_list
+            black_list = storage.black_list
             setTimeout(() => {
                 applyChannelFilters()
             }, 500);
         }
-        if (value.type != undefined) 
-            fav_type = value.type
-        if (value.show != undefined)
-            fav_show = value.show
+        if (storage.type != undefined) 
+            fav_type = storage.type
+        if (storage.show != undefined)
+            fav_show = storage.show
     })
 
+    // Creates a tall div so the user always has to scroll down to load more videos
     let block = document.createElement('div')
     block.style.marginTop = window.innerHeight + 'px'
     block.style.width = '100%'
@@ -52,6 +57,7 @@ function setup() {
         let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
         continue_element.insertAdjacentElement('beforebegin', block)
         num_of_vids_on_page = subs_dom.querySelector('#contents').childNodes.length
+        //Runs the filters whenever new videos are loaded in
         new MutationObserver(() => {
             let n = subs_dom.querySelector('#contents').childNodes.length
             if (n > num_of_vids_on_page) {
@@ -67,19 +73,19 @@ function setup() {
         }).observe(subs_dom.querySelector('#contents'), {childList: true})
     }, 1000);
 
+    //Runs the filters whenever the user navigates to the subs page
     window.addEventListener('yt-navigate-finish', () => {
-        if (window.location.pathname == '/feed/subscriptions') {
-            if(is_setup) {
-                setTimeout(() => {
-                    applyChannelFilters()
-                    applyFilters()
-                    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-                    continue_element.insertAdjacentElement('beforebegin', block)
-                }, WAIT_TIME);
-            }
+        if (window.location.pathname == '/feed/subscriptions' && is_setup) {
+            setTimeout(() => {
+                applyChannelFilters()
+                applyFilters()
+                let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+                continue_element.insertAdjacentElement('beforebegin', block)
+            }, WAIT_TIME);
         }
     })
 
+    //Runs the filters whenever the window is resized
     window.addEventListener('resize', () => {
         if (window.location.pathname == '/feed/subscriptions' && is_setup) {
             setTimeout(() => {
@@ -92,6 +98,7 @@ function setup() {
         }
     })
 
+    //Creates all the buttons for the user to apply filters 
     let show_element = document.createElement('div')
 
     let show_btn = document.createElement('div')
@@ -258,7 +265,7 @@ function applyFilters() {
         if (!vid.hasAttribute('is-slim-media')) {
             let progress = vid.querySelector('#progress')
             try {progress = progress.style.width.slice(0, -1)}
-            catch(err) {progress = 0}
+            catch(err) {progress = 0} //Sets to 0 if the progress bar doesn't exist on a video
             let is_live = (vid.querySelector('#metadata-line').textContent.includes('Streamed') || 
                             vid.querySelector('#metadata-line').textContent.includes('Scheduled') || 
                             (vid.querySelector('.badge-style-type-live-now-alternate') != null && vid.querySelector('.badge-style-type-live-now-alternate').textContent == 'LIVE')
@@ -311,7 +318,7 @@ function passesBlackList(channel, title) {
 
 function applyChannelFilters() {
     let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
-    let to_remove = []
+    let to_remove = [] //To not mess up JS going through the list of vids, removal is done after all the vids are found
     for (let v of vids) {
         if (!v.hasAttribute('is-slim-media')) {
             let channel = v.querySelector('#channel-name').querySelector('a').innerText.toLowerCase()
