@@ -276,7 +276,7 @@ function applyFilters() {
                 vid.classList.add('hidden')
         }
     }
-    if (type == 'Shorts')
+    if (type == 'Shorts' || type == 'All')
         subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].classList.remove('hidden')
     else
         subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].classList.add('hidden')
