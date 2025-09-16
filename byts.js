@@ -263,12 +263,12 @@ function applyFilters() {
     let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
     for (let vid of vids) {
         if (!vid.hasAttribute('is-slim-media')) {
-            let progress = vid.querySelector('#progress')
+            let progress = vid.querySelector('.ytThumbnailOverlayProgressBarHostWatchedProgressBarSegment')
             try {progress = progress.style.width.slice(0, -1)}
             catch(err) {progress = 0} //Sets to 0 if the progress bar doesn't exist on a video
-            let is_live = (vid.querySelector('#metadata-line').textContent.includes('Streamed') || 
-                            vid.querySelector('#metadata-line').textContent.includes('Scheduled') || 
-                            (vid.querySelector('.badge-style-type-live-now-alternate') != null && vid.querySelector('.badge-style-type-live-now-alternate').textContent == 'LIVE')
+            vid_meta_data = vid.querySelector('yt-content-metadata-view-model').textContent
+            let is_live = (vid_meta_data.includes('Streamed') || vid_meta_data.includes('Scheduled') || 
+                            (vid.querySelector('.yt-badge-shape--thumbnail-live') != null && vid.querySelector('.yt-badge-shape--thumbnail-live').textContent == 'LIVE')
                         )
             if (((type == 'Videos' && !is_live) || (type == 'Live Streams' && is_live) || type == 'All') && ((show == 'Unwatched' && progress < 15) || (show == 'Continue Watching' && progress >= 15 && progress <= 80) || (show == 'Finished' && progress > 80) || show == 'All'))
                 vid.classList.remove('hidden')
@@ -276,7 +276,7 @@ function applyFilters() {
                 vid.classList.add('hidden')
         }
     }
-    if (type == 'Shorts' || type == 'All')
+    if ((type == 'Shorts' || type == 'All') && (show == 'Unwatched' || show == 'All'))
         subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].classList.remove('hidden')
     else
         subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].classList.add('hidden')
@@ -292,7 +292,6 @@ function removeDuplicates() {
         }
     }
     for (let v of duplicates) {
-        console.log('duplicate removed')
         v.remove()
     }
 }
@@ -321,8 +320,8 @@ function applyChannelFilters() {
     let to_remove = [] //To not mess up JS going through the list of vids, removal is done after all the vids are found
     for (let v of vids) {
         if (!v.hasAttribute('is-slim-media')) {
-            let channel = v.querySelector('#channel-name').querySelector('a').innerText.toLowerCase()
-            let title = v.querySelector('#video-title').innerText.toLowerCase()
+            let channel = v.querySelector('yt-content-metadata-view-model').querySelector('a').innerText.toLowerCase()
+            let title = v.querySelector('yt-lockup-metadata-view-model').innerText.toLowerCase()
             if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
                 to_remove.push(v)
             }
