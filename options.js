@@ -103,10 +103,6 @@ show.addEventListener('change', () => {
     browser.storage.sync.set({show: show.value})
 })
 
-// alt_move_vids.addEventListener('change', () => {
-//     browser.storage.sync.set({alt_move_vids: alt_move_vids.value})
-// })
-
 browser.storage.sync.get().then((value) => {
     if (value.white_list != undefined){
         white_list = value.white_list
@@ -131,12 +127,6 @@ browser.storage.sync.get().then((value) => {
         show.value = 'Unwatched'
         browser.storage.sync.set({show: show.value})
     }
-    // if (value.alt_move_vids != undefined)
-    //     alt_move_vids.value = value.alt_move_vids
-    // else {
-    //     alt_move_vids.value = 'No'
-    //     browser.storage.sync.set({alt_move_vids: alt_move_vids.value})
-    // }
 }).then(() => {
     for (let i of white_list) 
         ul_white.appendChild(createLI(i.channel, i.title))

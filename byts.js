@@ -1,35 +1,77 @@
 let subs_dom
 let is_setup = false
 
-let type = 'All'
-let show = 'All'
-let type_prev = 'All'
-let show_prev = 'All'
+const Type = {
+    ALL: "All",
+    VID: "Videos",
+    SHORT: "Shorts",
+    LIVE: "Live Streams"
+}
+
+const Show = {
+    ALL: "All",
+    UNWATCHED: "Unwatched",
+    CONTINUE: "Continue Watching",
+    FINISH: "Finished"
+}
+
+const Fav = {
+    ACTIVE: "★",
+    INACTIVE: "☆"
+}
+
+let type = Type.ALL
+let type_prev = Type.ALL
+let show = Show.ALL
+let show_prev = Show.ALL
 
 let white_list = []
 let black_list = []
-let fav_type = "Videos"
-let fav_show = "Unwatched"
+let fav_type = Type.VID
+let fav_show = Show.UNWATCHED
 
-let WAIT_TIME = 1500
 let num_of_vids_on_page = 0
-
-//Runs setup if the window starts on the subs page 
-setTimeout(() => {
-    if (window.location.pathname == '/feed/subscriptions' && !is_setup)
-        setup()
-}, 2000);
-
-//Adds an event listener to run setup when the window goes to the subs page for the first time
-window.addEventListener('yt-navigate-finish', () => {
-    setTimeout(() => {
-        if (window.location.pathname == '/feed/subscriptions' && !is_setup)
-            setup()
-    }, 2000);
-})
 
 //Removes video preview on hover cause i don't like them
 document.querySelector('#video-preview').remove()
+
+start()
+
+async function start() {
+    if (window.location.pathname == '/feed/subscriptions' && !is_setup) {
+        waitForElement('ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer')
+        .then(setup)
+    } else if (!is_setup) {
+        //Adds an event listener to run setup when the window goes to the subs page for the first time
+        window.addEventListener('yt-navigate-finish', () => {
+            if (window.location.pathname == '/feed/subscriptions' && !is_setup) {
+                waitForElement('ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer')
+                .then(setup)
+            }
+        })
+    }
+}
+
+function waitForElement(selector, timeout = 5000) {
+  return new Promise((resolve, reject) => {
+    const intervalTime = 100;
+    let elapsedTime = 0;
+
+    const interval = setInterval(() => {
+      const el = document.querySelector(selector);
+      if (el != null) {
+        clearInterval(interval);
+        resolve(el);
+      }
+
+      elapsedTime += intervalTime;
+      if (elapsedTime >= timeout) {
+        clearInterval(interval);
+        reject(new Error(`Element "${selector}" not found within timeout`));
+      }
+    }, intervalTime);
+  });
+}
 
 function setup() {
     subs_dom = document.querySelector('ytd-browse[page-subtype="subscriptions"]')
@@ -53,48 +95,46 @@ function setup() {
     let block = document.createElement('div')
     block.style.marginTop = window.innerHeight + 'px'
     block.style.width = '100%'
-    setTimeout(() => {
-        let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-        continue_element.insertAdjacentElement('beforebegin', block)
-        num_of_vids_on_page = subs_dom.querySelector('#contents').childNodes.length
-        //Runs the filters whenever new videos are loaded in
-        new MutationObserver(() => {
-            let n = subs_dom.querySelector('#contents').childNodes.length
-            if (n > num_of_vids_on_page) {
-                setTimeout(() => {
-                    applyChannelFilters()
-                    applyFilters()
-                    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
-                    continue_element.insertAdjacentElement('beforebegin', block)
-                    window.scrollTo(0,0)
-                }, WAIT_TIME)
-                num_of_vids_on_page = n
-            }
-        }).observe(subs_dom.querySelector('#contents'), {childList: true})
-    }, 1000);
+    let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+    continue_element.insertAdjacentElement('beforebegin', block)
+    num_of_vids_on_page = subs_dom.querySelector('#contents').childNodes.length
+    //Runs the filters whenever new videos are loaded in
+    new MutationObserver(() => {
+        let n = subs_dom.querySelector('#contents').childNodes.length
+        if (n > num_of_vids_on_page) {
+            applyChannelFilters()
+            applyFilters()
+            let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
+            continue_element.insertAdjacentElement('beforebegin', block)
+            window.scrollTo(0,0)
+            num_of_vids_on_page = n
+        }
+    }).observe(subs_dom.querySelector('#contents'), {childList: true})
 
     //Runs the filters whenever the user navigates to the subs page
     window.addEventListener('yt-navigate-finish', () => {
         if (window.location.pathname == '/feed/subscriptions' && is_setup) {
-            setTimeout(() => {
+            waitForElement('ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer')
+            .then(() => {
                 applyChannelFilters()
                 applyFilters()
                 let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
                 continue_element.insertAdjacentElement('beforebegin', block)
-            }, WAIT_TIME);
+            })
         }
     })
 
     //Runs the filters whenever the window is resized
     window.addEventListener('resize', () => {
         if (window.location.pathname == '/feed/subscriptions' && is_setup) {
-            setTimeout(() => {
+            waitForElement('ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer')
+            .then(() => {
                 applyChannelFilters()
                 applyFilters()
                 removeDuplicates()
                 let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
                 continue_element.insertAdjacentElement('beforebegin', block)
-            }, WAIT_TIME);
+            })
         }
     })
 
@@ -105,46 +145,45 @@ function setup() {
     show_btn.innerText = 'SHOW'
     show_btn.classList.add('btn')
     show_btn.onclick = () => {
-        if (type != 'Shorts') {
+        if (type != Type.SHORT) {
             show_dropdown.classList.toggle('hidden')
             type_dropdown.classList.add('hidden')
         }
     }
 
     let show_dropdown = document.createElement('div')
-    show_dropdown.classList.add('dropdown_content')
-    show_dropdown.classList.add('hidden')
+    show_dropdown.classList.add('dropdown_content', 'hidden')
     show_dropdown.onclick = () => {
-        favorite.innerText = '☆'
+        favorite.innerText = Fav.INACTIVE
         applyFilters()
     }
 
     let show_all = document.createElement('div')
-    show_all.innerText = 'All'
+    show_all.innerText = Show.ALL
     show_all.onclick = () => {
-        show = 'All'
+        show = Show.ALL
         show_status.innerText = ''
     }
 
     let show_unwatched = document.createElement('div')
-    show_unwatched.innerText = 'Unwatched'
+    show_unwatched.innerText = Show.UNWATCHED
     show_unwatched.onclick = () => {
-        show = 'Unwatched'
-        show_status.innerText = 'UNWATCHED'
+        show = Show.UNWATCHED
+        show_status.innerText = Show.UNWATCHED.toUpperCase()
     }
 
     let show_continue_watching = document.createElement('div')
-    show_continue_watching.innerText = 'Continue Watching'
+    show_continue_watching.innerText = Show.CONTINUE
     show_continue_watching.onclick = () => {
-        show = 'Continue Watching'
-        show_status.innerText = 'CONTINUE WATCHING'
+        show = Show.CONTINUE
+        show_status.innerText = Show.CONTINUE.toUpperCase()
     }
 
     let show_finished = document.createElement('div')
-    show_finished.innerText = 'Finished'
+    show_finished.innerText = Show.FINISH
     show_finished.onclick = () => {
-        show = 'Finished'
-        show_status.innerText = 'FINISHED'
+        show = Show.FINISH
+        show_status.innerText = Show.FINISH.toUpperCase()
     }
 
     show_dropdown.appendChild(show_all)
@@ -165,41 +204,40 @@ function setup() {
     }
 
     let type_dropdown = document.createElement('div')
-    type_dropdown.classList.add('dropdown_content')
-    type_dropdown.classList.add('hidden')
+    type_dropdown.classList.add('dropdown_content', 'hidden')
     type_dropdown.onclick = () => {
-        favorite.innerText = '☆'
+        favorite.innerText = Fav.INACTIVE
         applyFilters()
     }
 
     let type_all = document.createElement('div')
-    type_all.innerText = 'All'
+    type_all.innerText = Type.ALL
     type_all.onclick = () => {
-        type = 'All'
+        type = Type.ALL
         type_status.innerText = ''
     }
 
     let type_videos = document.createElement('div')
-    type_videos.innerText = 'Videos'
+    type_videos.innerText = Type.VID
     type_videos.onclick = () => {
-        type = 'Videos'
-        type_status.innerText = 'VIDEOS'
+        type = Type.VID
+        type_status.innerText = Type.VID.toUpperCase()
     }
 
     let type_shorts = document.createElement('div')
-    type_shorts.innerText = 'Shorts'
+    type_shorts.innerText = Type.SHORT
     type_shorts.onclick = () => {
-        type = 'Shorts'
-        type_status.innerText = 'SHORTS'
-        show = 'All'
+        type = Type.SHORT
+        type_status.innerText = Type.SHORT.toUpperCase()
+        show = Show.ALL
         show_status.innerText = ''
     }
 
     let type_live = document.createElement('div')
-    type_live.innerText = 'Live Streams'
+    type_live.innerText = Type.LIVE
     type_live.onclick = () => {
-        type = 'Live Streams'
-        type_status.innerText = 'LIVE STREAMS'
+        type = Type.LIVE
+        type_status.innerText = Type.LIVE.toUpperCase()
     }
 
     type_dropdown.appendChild(type_all)
@@ -210,23 +248,24 @@ function setup() {
     type_element.appendChild(type_dropdown)
 
     let favorite = document.createElement('button')
-    favorite.classList.add('fav_btn')
-    favorite.innerText = '☆'
+    favorite.classList.add('btn', 'fav_btn')
+    favorite.innerText = Fav.INACTIVE
     favorite.onclick = () => {
-        if (favorite.innerText == '★') {
+        if (favorite.innerText == Fav.ACTIVE) {
             type = type_prev
             show = show_prev
-            type_status.innerText = (type == 'All') ? '' : type.toUpperCase()
-            show_status.innerText = (show == 'All') ? '' : show.toUpperCase()
-            favorite.innerText = '☆'
+            console.log(type)
+            type_status.innerText = (type == Type.ALL) ? '' : type.toUpperCase()
+            show_status.innerText = (show == Show.ALL) ? '' : show.toUpperCase()
+            favorite.innerText = Fav.INACTIVE
         } else {
             type_prev = type
             show_prev = show
             type = fav_type
-            type_status.innerText = (fav_type == 'All') ? '' : type.toUpperCase()
+            type_status.innerText = (fav_type == Type.ALL) ? '' : type.toUpperCase()
             show = fav_show
-            show_status.innerText = (fav_show == 'All') ? '' : show.toUpperCase()
-            favorite.innerText = '★'
+            show_status.innerText = (fav_show == Show.ALL) ? '' : show.toUpperCase()
+            favorite.innerText = Fav.ACTIVE
         }
         applyFilters()
     }
@@ -268,15 +307,21 @@ function applyFilters() {
             catch(err) {progress = 0} //Sets to 0 if the progress bar doesn't exist on a video
             vid_meta_data = vid.querySelector('yt-content-metadata-view-model').textContent
             let is_live = (vid_meta_data.includes('Streamed') || vid_meta_data.includes('Scheduled') || 
-                            (vid.querySelector('.yt-badge-shape--thumbnail-live') != null && vid.querySelector('.yt-badge-shape--thumbnail-live').textContent == 'LIVE')
+                            (vid.querySelector('.yt-badge-shape--thumbnail-live') != null && 
+                                vid.querySelector('.yt-badge-shape--thumbnail-live').textContent == 'LIVE'
+                            )
                         )
-            if (((type == 'Videos' && !is_live) || (type == 'Live Streams' && is_live) || type == 'All') && ((show == 'Unwatched' && progress < 15) || (show == 'Continue Watching' && progress >= 15 && progress <= 80) || (show == 'Finished' && progress > 80) || show == 'All'))
+            if (((type == Type.VID && !is_live) || (type == Type.LIVE && is_live) || type == Type.ALL) && 
+                ((show == Show.UNWATCHED && progress < 15) || (show == Show.CONTINUE && progress >= 15 && progress <= 80) || 
+                    (show == Show.FINISH && progress > 80) || show == Show.ALL
+                )
+            )
                 vid.classList.remove('hidden')
             else
                 vid.classList.add('hidden')
         }
     }
-    if ((type == 'Shorts' || type == 'All') && (show == 'Unwatched' || show == 'All'))
+    if ((type == Type.SHORT || type == Type.ALL) && (show == Show.UNWATCHED || show == Show.ALL))
         subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].classList.remove('hidden')
     else
         subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].classList.add('hidden')
@@ -299,7 +344,7 @@ function removeDuplicates() {
 function passesWhiteList(channel, title) {
     let isChannelInWhiteList = false
     for (let obj of white_list) {
-        if (channel == obj.channel.toLowerCase()) {
+        if (channel.includes(obj.channel.toLowerCase())) {
             isChannelInWhiteList = true
             if (title.includes(obj.title.toLowerCase())) 
                 return true
@@ -310,7 +355,7 @@ function passesWhiteList(channel, title) {
 
 function passesBlackList(channel, title) {
     for (let obj of black_list)
-        if (channel == obj.channel.toLowerCase() && title.includes(obj.title.toLowerCase())) 
+        if (channel.includes(obj.channel.toLowerCase()) && (title.includes(obj.title.toLowerCase()) || title != "*")) 
             return false
     return true
 }
