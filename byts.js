@@ -54,7 +54,7 @@ async function start() {
 
 function waitForElement(selector, timeout = 5000) {
   return new Promise((resolve, reject) => {
-    const intervalTime = 100;
+    const intervalTime = 200;
     let elapsedTime = 0;
 
     const interval = setInterval(() => {
@@ -254,7 +254,6 @@ function setup() {
         if (favorite.innerText == Fav.ACTIVE) {
             type = type_prev
             show = show_prev
-            console.log(type)
             type_status.innerText = (type == Type.ALL) ? '' : type.toUpperCase()
             show_status.innerText = (show == Show.ALL) ? '' : show.toUpperCase()
             favorite.innerText = Fav.INACTIVE
@@ -355,7 +354,7 @@ function passesWhiteList(channel, title) {
 
 function passesBlackList(channel, title) {
     for (let obj of black_list)
-        if (channel.includes(obj.channel.toLowerCase()) && (title.includes(obj.title.toLowerCase()) || title != "*")) 
+        if (channel.includes(obj.channel.toLowerCase()) && (title.includes(obj.title.toLowerCase()) || obj.title == "*")) 
             return false
     return true
 }
