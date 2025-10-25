@@ -20,6 +20,8 @@ const Fav = {
     INACTIVE: "☆"
 }
 
+const page_finished_loading_element = 'ytd-browse[page-subtype="subscriptions"] yt-content-metadata-view-model'
+
 let type = Type.ALL
 let type_prev = Type.ALL
 let show = Show.ALL
@@ -38,16 +40,15 @@ document.querySelector('#video-preview').remove()
 start()
 
 async function start() {
-    if (window.location.pathname == '/feed/subscriptions' && !is_setup) {
-        waitForElement('ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer')
+    if (window.location.pathname == '/feed/subscriptions' && !is_setup)
+        waitForElement(page_finished_loading_element)
         .then(setup)
-    } else if (!is_setup) {
+    else if (!is_setup) {
         //Adds an event listener to run setup when the window goes to the subs page for the first time
         window.addEventListener('yt-navigate-finish', () => {
-            if (window.location.pathname == '/feed/subscriptions' && !is_setup) {
-                waitForElement('ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer')
+            if (!is_setup && window.location.pathname == '/feed/subscriptions')
+                waitForElement(page_finished_loading_element)
                 .then(setup)
-            }
         })
     }
 }
@@ -113,21 +114,20 @@ function setup() {
 
     //Runs the filters whenever the user navigates to the subs page
     window.addEventListener('yt-navigate-finish', () => {
-        if (window.location.pathname == '/feed/subscriptions' && is_setup) {
-            waitForElement('ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer')
+        if (window.location.pathname == '/feed/subscriptions' && is_setup)
+            waitForElement(page_finished_loading_element)
             .then(() => {
                 applyChannelFilters()
                 applyFilters()
                 let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
                 continue_element.insertAdjacentElement('beforebegin', block)
             })
-        }
     })
 
     //Runs the filters whenever the window is resized
     window.addEventListener('resize', () => {
-        if (window.location.pathname == '/feed/subscriptions' && is_setup) {
-            waitForElement('ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer')
+        if (window.location.pathname == '/feed/subscriptions' && is_setup)
+            waitForElement(page_finished_loading_element)
             .then(() => {
                 applyChannelFilters()
                 applyFilters()
@@ -135,7 +135,6 @@ function setup() {
                 let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
                 continue_element.insertAdjacentElement('beforebegin', block)
             })
-        }
     })
 
     //Creates all the buttons for the user to apply filters 
@@ -335,9 +334,8 @@ function removeDuplicates() {
                 duplicates.push(vids[j])
         }
     }
-    for (let v of duplicates) {
+    for (let v of duplicates)
         v.remove()
-    }
 }
 
 function passesWhiteList(channel, title) {
@@ -366,9 +364,8 @@ function applyChannelFilters() {
         if (!v.hasAttribute('is-slim-media')) {
             let channel = v.querySelector('yt-content-metadata-view-model').querySelector('a').innerText.toLowerCase()
             let title = v.querySelector('yt-lockup-metadata-view-model').innerText.toLowerCase()
-            if (!(passesWhiteList(channel, title) && passesBlackList(channel, title))) {
+            if (!(passesWhiteList(channel, title) && passesBlackList(channel, title)))
                 to_remove.push(v)
-            }
         }
     }
     for (let v of to_remove)
