@@ -20,7 +20,7 @@ const Fav = {
     INACTIVE: "☆"
 }
 
-const page_finished_loading_element = 'ytd-browse[page-subtype="subscriptions"] yt-content-metadata-view-model'
+const page_finished_loading_element = 'ytd-browse[page-subtype="subscriptions"] yt-lockup-metadata-view-model a'
 
 let type = Type.ALL
 let type_prev = Type.ALL
@@ -362,8 +362,8 @@ function applyChannelFilters() {
     let to_remove = [] //To not mess up JS going through the list of vids, removal is done after all the vids are found
     for (let v of vids) {
         if (!v.hasAttribute('is-slim-media')) {
-            let channel = v.querySelector('yt-content-metadata-view-model').querySelector('a').innerText.toLowerCase()
-            let title = v.querySelector('yt-lockup-metadata-view-model').innerText.toLowerCase()
+            let channel = v.querySelector('yt-content-metadata-view-model span').innerText.toLowerCase()
+            let title = v.querySelector('yt-lockup-metadata-view-model a').innerText.toLowerCase()
             if (!(passesWhiteList(channel, title) && passesBlackList(channel, title)))
                 to_remove.push(v)
         }
