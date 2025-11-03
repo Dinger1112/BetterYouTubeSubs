@@ -57,12 +57,16 @@ function waitForElement(selector, timeout = 5000) {
   return new Promise((resolve, reject) => {
     const intervalTime = 200;
     let elapsedTime = 0;
+    let found = false;
 
     const interval = setInterval(() => {
       const el = document.querySelector(selector);
-      if (el != null) {
+      if (found) {
         clearInterval(interval);
         resolve(el);
+      }
+      if (el != null) {
+        found = true;
       }
 
       elapsedTime += intervalTime;
