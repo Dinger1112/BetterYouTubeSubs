@@ -34,6 +34,149 @@ let fav_show = Show.UNWATCHED
 
 let num_of_vids_on_page = 0
 
+//Creates all the buttons for the user to apply filters 
+let show_element = document.createElement('div')
+
+let show_btn = document.createElement('div')
+show_btn.innerText = 'SHOW'
+show_btn.classList.add('btn')
+show_btn.onclick = () => {
+    if (type != Type.SHORT) {
+        show_dropdown.classList.toggle('hidden')
+        type_dropdown.classList.add('hidden')
+    }
+}
+
+let show_dropdown = document.createElement('div')
+show_dropdown.classList.add('dropdown_content', 'hidden')
+show_dropdown.onclick = () => {
+    favorite.innerText = Fav.INACTIVE
+    applyFilters()
+}
+
+let show_all = document.createElement('div')
+show_all.innerText = Show.ALL
+show_all.onclick = () => {
+    show = Show.ALL
+    show_status.innerText = ''
+}
+
+let show_unwatched = document.createElement('div')
+show_unwatched.innerText = Show.UNWATCHED
+show_unwatched.onclick = () => {
+    show = Show.UNWATCHED
+    show_status.innerText = Show.UNWATCHED.toUpperCase()
+}
+
+let show_continue_watching = document.createElement('div')
+show_continue_watching.innerText = Show.CONTINUE
+show_continue_watching.onclick = () => {
+    show = Show.CONTINUE
+    show_status.innerText = Show.CONTINUE.toUpperCase()
+}
+
+let show_finished = document.createElement('div')
+show_finished.innerText = Show.FINISH
+show_finished.onclick = () => {
+    show = Show.FINISH
+    show_status.innerText = Show.FINISH.toUpperCase()
+}
+
+show_dropdown.appendChild(show_all)
+show_dropdown.appendChild(show_unwatched)
+show_dropdown.appendChild(show_continue_watching)
+show_dropdown.appendChild(show_finished)
+show_element.appendChild(show_btn)
+show_element.appendChild(show_dropdown)
+
+let type_element = document.createElement('div')
+
+let type_btn = document.createElement('div')
+type_btn.innerText = 'TYPE'
+type_btn.classList.add('btn')
+type_btn.onclick = () => {
+    type_dropdown.classList.toggle('hidden')
+    show_dropdown.classList.add('hidden')
+}
+
+let type_dropdown = document.createElement('div')
+type_dropdown.classList.add('dropdown_content', 'hidden')
+type_dropdown.onclick = () => {
+    favorite.innerText = Fav.INACTIVE
+    applyFilters()
+}
+
+let type_all = document.createElement('div')
+type_all.innerText = Type.ALL
+type_all.onclick = () => {
+    type = Type.ALL
+    type_status.innerText = ''
+}
+
+let type_videos = document.createElement('div')
+type_videos.innerText = Type.VID
+type_videos.onclick = () => {
+    type = Type.VID
+    type_status.innerText = Type.VID.toUpperCase()
+}
+
+let type_shorts = document.createElement('div')
+type_shorts.innerText = Type.SHORT
+type_shorts.onclick = () => {
+    type = Type.SHORT
+    type_status.innerText = Type.SHORT.toUpperCase()
+    show = Show.ALL
+    show_status.innerText = ''
+}
+
+let type_live = document.createElement('div')
+type_live.innerText = Type.LIVE
+type_live.onclick = () => {
+    type = Type.LIVE
+    type_status.innerText = Type.LIVE.toUpperCase()
+}
+
+type_dropdown.appendChild(type_all)
+type_dropdown.appendChild(type_videos)
+type_dropdown.appendChild(type_shorts)
+type_dropdown.appendChild(type_live)
+type_element.appendChild(type_btn)
+type_element.appendChild(type_dropdown)
+
+let favorite = document.createElement('button')
+favorite.classList.add('btn', 'fav_btn')
+favorite.innerText = Fav.INACTIVE
+favorite.onclick = () => {
+    if (favorite.innerText == Fav.ACTIVE) {
+        type = type_prev
+        show = show_prev
+        type_status.innerText = (type == Type.ALL) ? '' : type.toUpperCase()
+        show_status.innerText = (show == Show.ALL) ? '' : show.toUpperCase()
+        favorite.innerText = Fav.INACTIVE
+    } else {
+        type_prev = type
+        show_prev = show
+        type = fav_type
+        type_status.innerText = (fav_type == Type.ALL) ? '' : type.toUpperCase()
+        show = fav_show
+        show_status.innerText = (fav_show == Show.ALL) ? '' : show.toUpperCase()
+        favorite.innerText = Fav.ACTIVE
+    }
+    applyFilters()
+}
+
+let status_element = document.createElement('div')
+status_element.classList.add('status')
+
+let show_status = document.createElement('div')
+show_status.classList.add('show_status')
+
+let type_status = document.createElement('div')
+type_status.classList.add('type_status')
+
+status_element.appendChild(show_status)
+status_element.appendChild(type_status)
+
 //Removes video preview on hover cause i don't like them
 document.querySelector('#video-preview').remove()
 
@@ -118,14 +261,16 @@ function setup() {
 
     //Runs the filters whenever the user navigates to the subs page
     window.addEventListener('yt-navigate-finish', () => {
-        if (window.location.pathname == '/feed/subscriptions' && is_setup)
-            waitForElement(page_finished_loading_element)
-            .then(() => {
+        waitForElement(page_finished_loading_element)
+        .then(() => {
+            if (window.location.pathname == '/feed/subscriptions' && is_setup) {
+                add_buttons_to_page()
                 applyChannelFilters()
                 applyFilters()
                 let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
                 continue_element.insertAdjacentElement('beforebegin', block)
-            })
+            }
+        })
     })
 
     //Runs the filters whenever the window is resized
@@ -133,6 +278,7 @@ function setup() {
         if (window.location.pathname == '/feed/subscriptions' && is_setup)
             waitForElement(page_finished_loading_element)
             .then(() => {
+                add_buttons_to_page()
                 applyChannelFilters()
                 applyFilters()
                 removeDuplicates()
@@ -141,154 +287,7 @@ function setup() {
             })
     })
 
-    //Creates all the buttons for the user to apply filters 
-    let show_element = document.createElement('div')
-
-    let show_btn = document.createElement('div')
-    show_btn.innerText = 'SHOW'
-    show_btn.classList.add('btn')
-    show_btn.onclick = () => {
-        if (type != Type.SHORT) {
-            show_dropdown.classList.toggle('hidden')
-            type_dropdown.classList.add('hidden')
-        }
-    }
-
-    let show_dropdown = document.createElement('div')
-    show_dropdown.classList.add('dropdown_content', 'hidden')
-    show_dropdown.onclick = () => {
-        favorite.innerText = Fav.INACTIVE
-        applyFilters()
-    }
-
-    let show_all = document.createElement('div')
-    show_all.innerText = Show.ALL
-    show_all.onclick = () => {
-        show = Show.ALL
-        show_status.innerText = ''
-    }
-
-    let show_unwatched = document.createElement('div')
-    show_unwatched.innerText = Show.UNWATCHED
-    show_unwatched.onclick = () => {
-        show = Show.UNWATCHED
-        show_status.innerText = Show.UNWATCHED.toUpperCase()
-    }
-
-    let show_continue_watching = document.createElement('div')
-    show_continue_watching.innerText = Show.CONTINUE
-    show_continue_watching.onclick = () => {
-        show = Show.CONTINUE
-        show_status.innerText = Show.CONTINUE.toUpperCase()
-    }
-
-    let show_finished = document.createElement('div')
-    show_finished.innerText = Show.FINISH
-    show_finished.onclick = () => {
-        show = Show.FINISH
-        show_status.innerText = Show.FINISH.toUpperCase()
-    }
-
-    show_dropdown.appendChild(show_all)
-    show_dropdown.appendChild(show_unwatched)
-    show_dropdown.appendChild(show_continue_watching)
-    show_dropdown.appendChild(show_finished)
-    show_element.appendChild(show_btn)
-    show_element.appendChild(show_dropdown)
-
-    let type_element = document.createElement('div')
-
-    let type_btn = document.createElement('div')
-    type_btn.innerText = 'TYPE'
-    type_btn.classList.add('btn')
-    type_btn.onclick = () => {
-        type_dropdown.classList.toggle('hidden')
-        show_dropdown.classList.add('hidden')
-    }
-
-    let type_dropdown = document.createElement('div')
-    type_dropdown.classList.add('dropdown_content', 'hidden')
-    type_dropdown.onclick = () => {
-        favorite.innerText = Fav.INACTIVE
-        applyFilters()
-    }
-
-    let type_all = document.createElement('div')
-    type_all.innerText = Type.ALL
-    type_all.onclick = () => {
-        type = Type.ALL
-        type_status.innerText = ''
-    }
-
-    let type_videos = document.createElement('div')
-    type_videos.innerText = Type.VID
-    type_videos.onclick = () => {
-        type = Type.VID
-        type_status.innerText = Type.VID.toUpperCase()
-    }
-
-    let type_shorts = document.createElement('div')
-    type_shorts.innerText = Type.SHORT
-    type_shorts.onclick = () => {
-        type = Type.SHORT
-        type_status.innerText = Type.SHORT.toUpperCase()
-        show = Show.ALL
-        show_status.innerText = ''
-    }
-
-    let type_live = document.createElement('div')
-    type_live.innerText = Type.LIVE
-    type_live.onclick = () => {
-        type = Type.LIVE
-        type_status.innerText = Type.LIVE.toUpperCase()
-    }
-
-    type_dropdown.appendChild(type_all)
-    type_dropdown.appendChild(type_videos)
-    type_dropdown.appendChild(type_shorts)
-    type_dropdown.appendChild(type_live)
-    type_element.appendChild(type_btn)
-    type_element.appendChild(type_dropdown)
-
-    let favorite = document.createElement('button')
-    favorite.classList.add('btn', 'fav_btn')
-    favorite.innerText = Fav.INACTIVE
-    favorite.onclick = () => {
-        if (favorite.innerText == Fav.ACTIVE) {
-            type = type_prev
-            show = show_prev
-            type_status.innerText = (type == Type.ALL) ? '' : type.toUpperCase()
-            show_status.innerText = (show == Show.ALL) ? '' : show.toUpperCase()
-            favorite.innerText = Fav.INACTIVE
-        } else {
-            type_prev = type
-            show_prev = show
-            type = fav_type
-            type_status.innerText = (fav_type == Type.ALL) ? '' : type.toUpperCase()
-            show = fav_show
-            show_status.innerText = (fav_show == Show.ALL) ? '' : show.toUpperCase()
-            favorite.innerText = Fav.ACTIVE
-        }
-        applyFilters()
-    }
-
-    let status_element = document.createElement('div')
-    status_element.classList.add('status')
-
-    let show_status = document.createElement('div')
-    show_status.classList.add('show_status')
-
-    let type_status = document.createElement('div')
-    type_status.classList.add('type_status')
-    
-    status_element.appendChild(show_status)
-    status_element.appendChild(type_status)
-
-    let title_container = subs_dom.querySelector('ytd-rich-section-renderer').querySelector('#title-container')
-    title_container.insertBefore(show_element, title_container.childNodes[5])
-    title_container.insertBefore(type_element, title_container.childNodes[5])
-    title_container.insertBefore(favorite, title_container.childNodes[5])
-    title_container.insertBefore(status_element, title_container.childNodes[5])
+    add_buttons_to_page()
 
     window.addEventListener('click', (event) => {
         if (!event.target.matches('.btn')) {
@@ -298,6 +297,14 @@ function setup() {
     })
 
     is_setup = true
+}
+
+function add_buttons_to_page() {
+    let title_container = subs_dom.querySelector('ytd-rich-section-renderer').querySelector('#title-container')
+    title_container.insertBefore(show_element, title_container.childNodes[5])
+    title_container.insertBefore(type_element, title_container.childNodes[5])
+    title_container.insertBefore(favorite, title_container.childNodes[5])
+    title_container.insertBefore(status_element, title_container.childNodes[5])
 }
 
 function applyFilters() {
