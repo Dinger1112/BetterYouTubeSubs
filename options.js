@@ -9,6 +9,7 @@ const export_btn = document.getElementById('export')
 const import_btn = document.getElementById('import')
 const type = document.getElementById('type')
 const show = document.getElementById('show')
+const relevant = document.getElementById('disableMostRelevant')
 
 white_btn.addEventListener('click', () => {
     let channel_input = document.getElementById('white_channel_input')
@@ -82,9 +83,15 @@ import_btn.addEventListener('change', () => {
                 black_list.push({'channel':i.channel, 'title':i.title})
             }
         }
+        show.value = show.value != undefined ? data.show : 'Unwatched'
+        type.value = data.type != undefined ? data.type : 'Videos'
+        relevant.checked = data.relevant != undefined ? data.relevant : true
         browser.storage.sync.set({
             white_list: white_list,
-            black_list: black_list
+            black_list: black_list,
+            show: show.value,
+            type: type.value,
+            relevant: relevant.checked
         })
     })
 })
@@ -101,6 +108,10 @@ type.addEventListener('change', () => {
 
 show.addEventListener('change', () => {
     browser.storage.sync.set({show: show.value})
+})
+
+relevant.addEventListener('change', () => {
+    browser.storage.sync.set({relevant: relevant.checked})
 })
 
 browser.storage.sync.get().then((value) => {
@@ -127,6 +138,11 @@ browser.storage.sync.get().then((value) => {
         show.value = 'Unwatched'
         browser.storage.sync.set({show: show.value})
     }
+    if (value.relevant != undefined)
+        relevant.checked = value.relevant
+    else
+        browser.storage.sync.set({relevant: true})
+
 }).then(() => {
     for (let i of white_list) 
         ul_white.appendChild(createLI(i.channel, i.title))

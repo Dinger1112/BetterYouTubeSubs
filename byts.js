@@ -32,6 +32,8 @@ let black_list = []
 let fav_type = Type.VID
 let fav_show = Show.UNWATCHED
 
+let hide_most_relevant = true
+
 let num_of_vids_on_page = 0
 
 //Creates all the buttons for the user to apply filters 
@@ -237,6 +239,10 @@ function setup() {
             fav_type = storage.type
         if (storage.show != undefined)
             fav_show = storage.show
+        if (storage.relevant != undefined)
+            hide_most_relevant = storage.relevant
+        if (hide_most_relevant)
+            subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].remove()
     })
 
     // Creates a tall div so the user always has to scroll down to load more videos
@@ -330,10 +336,11 @@ function applyFilters() {
                 vid.classList.add('hidden')
         }
     }
+    let sections = subs_dom.getElementsByTagName('ytd-rich-section-renderer')
     if ((type == Type.SHORT || type == Type.ALL) && (show == Show.UNWATCHED || show == Show.ALL))
-        subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].classList.remove('hidden')
+        sections[sections.length-1].classList.remove('hidden')
     else
-        subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].classList.add('hidden')
+        sections[sections.length-1].classList.add('hidden')
 }
 
 function removeDuplicates() {

@@ -12,7 +12,7 @@
 
 .dropdown_content {
     position: absolute;
-    background-color: var(--yt-spec-brand-background-primary);
+    background-color: var(--yt-spec-base-background);
     border: var(--yt-spec-text-primary) solid 1px;
     z-index: 2;
     cursor: pointer;
@@ -21,7 +21,7 @@
 
 .dropdown_content div {
     color: var(--yt-spec-text-primary);
-    background-color: var(--yt-spec-brand-background-primary);
+    background-color: var(--yt-spec-base-background);
     padding: 12px 16px;
 }
 
