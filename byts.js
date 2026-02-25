@@ -241,8 +241,9 @@ function setup() {
             fav_show = storage.show
         if (storage.relevant != undefined)
             hide_most_relevant = storage.relevant
-        if (hide_most_relevant)
-            subs_dom.getElementsByTagName('ytd-rich-section-renderer')[1].remove()
+        if (hide_most_relevant) {
+            remove_most_relevant()
+        }
     })
 
     // Creates a tall div so the user always has to scroll down to load more videos
@@ -271,6 +272,8 @@ function setup() {
         .then(() => {
             if (window.location.pathname == '/feed/subscriptions' && is_setup) {
                 add_buttons_to_page()
+                if (hide_most_relevant)
+                    remove_most_relevant()
                 applyChannelFilters()
                 applyFilters()
                 let continue_element = subs_dom.querySelector('ytd-continuation-item-renderer')
@@ -285,6 +288,8 @@ function setup() {
             waitForElement(page_finished_loading_element)
             .then(() => {
                 add_buttons_to_page()
+                if (hide_most_relevant)
+                    remove_most_relevant()
                 applyChannelFilters()
                 applyFilters()
                 removeDuplicates()
@@ -313,6 +318,15 @@ function add_buttons_to_page() {
     title_container.insertBefore(status_element, title_container.childNodes[5])
 }
 
+function remove_most_relevant() {
+    for (let section of subs_dom.getElementsByTagName('ytd-rich-section-renderer')) {
+        if (section.innerText.startsWith('Most relevant')) {
+            section.remove()
+            break
+        }
+    }
+}
+
 function applyFilters() {
     let vids = subs_dom.getElementsByTagName('ytd-rich-item-renderer')
     for (let vid of vids) {
@@ -336,11 +350,17 @@ function applyFilters() {
                 vid.classList.add('hidden')
         }
     }
-    let sections = subs_dom.getElementsByTagName('ytd-rich-section-renderer')
+    let shorts_section
+    for (let section of subs_dom.getElementsByTagName('ytd-rich-section-renderer')) {
+        if (section.innerText.startsWith('Shorts')) {
+            shorts_section = section
+            break
+        }
+    }
     if ((type == Type.SHORT || type == Type.ALL) && (show == Show.UNWATCHED || show == Show.ALL))
-        sections[sections.length-1].classList.remove('hidden')
+        shorts_section.classList.remove('hidden')
     else
-        sections[sections.length-1].classList.add('hidden')
+        shorts_section.classList.add('hidden')
 }
 
 function removeDuplicates() {
