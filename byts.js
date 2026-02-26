@@ -320,7 +320,7 @@ function add_buttons_to_page() {
 
 function remove_most_relevant() {
     for (let section of subs_dom.getElementsByTagName('ytd-rich-section-renderer')) {
-        if (section.innerText.startsWith('Most relevant')) {
+        if (section.innerText.trim().startsWith('Most relevant')) {
             section.remove()
             break
         }
@@ -352,7 +352,7 @@ function applyFilters() {
     }
     let shorts_section
     for (let section of subs_dom.getElementsByTagName('ytd-rich-section-renderer')) {
-        if (section.innerText.startsWith('Shorts')) {
+        if (section.innerText.trim().startsWith('Shorts')) {
             shorts_section = section
             break
         }
