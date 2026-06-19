@@ -336,7 +336,7 @@ function applyFilters() {
             catch(err) {progress = 0} //Sets to 0 if the progress bar doesn't exist on a video
             vid_meta_data = vid.querySelector('yt-content-metadata-view-model').textContent
             let is_live = vid_meta_data.includes('Streamed') || vid_meta_data.includes('Scheduled') || 
-                            vid.querySelector('.ytBadgeShapeThumbnailLive')
+                            vid.querySelector('.ytBadgeShapeThumbnailLive')?.innerText == 'LIVE'
             if (((type == Type.VID && !is_live) || (type == Type.LIVE && is_live) || type == Type.ALL) && 
                 ((show == Show.UNWATCHED && progress < 15) || (show == Show.CONTINUE && progress >= 15 && progress <= 80) || 
                     (show == Show.FINISH && progress > 80) || show == Show.ALL
